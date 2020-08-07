@@ -1,0 +1,104 @@
+-- TPLang is a language inspired by FANUC TPE.
+
+
+-- comments are maked with the "exclamation marks" 
+comment "!";
+comment "//"; --remark
+
+-- each TPE starts with the prog token and a name.
+PROG. 	     section ::=
+ATTR. 	     section ::=
+APPL.        section ::=
+MN.          section ::=
+POS.         section ::=
+END.         section ::=
+
+-- TYPES
+IDENT.  type_section ::=
+STRING.	type_section ::=
+INT.    type_section ::=
+REAL.   type_section ::=
+
+-- ATTRIBUTES
+TCD.            attr ::=
+TIME.		attr ::=
+DATE.		attr ::=
+OWNER		attr ::=
+CREATE.		attr ::=
+ASCBIN.		attr ::=
+VERSION.	attr ::=
+COMMENT.	attr ::=
+PROTECT.	attr ::=
+MODIFIED.	attr ::=
+FILE_NAME.	attr ::=
+PROG_SIZE.	attr ::=
+LINE_COUNT.	attr ::=
+TIME_SLICE.	attr ::=
+READ_WRITE.	attr ::=
+STACK_SIZE.	attr ::=
+MEMORY_SIZE.	attr ::=
+CONTROL_CODE.	attr ::=
+PAUSE_REQUEST.	attr ::=
+TASK_PRIORITY.	attr ::=
+DEFAULT_GROUP.	attr ::=
+BUSY_LAMP_OFF.	attr ::=
+ABORT_REQUEST.	attr ::=
+
+UFRAME.	      frames ::=
+UTOOL.	      frames ::=
+
+SYSVAR.     variable ::=
+
+AI.         register ::=
+AO.	    register ::=
+DI.	    register ::=
+DO.	    register ::=
+GI.	    register ::=
+GO.	    register ::=
+RI.	    register ::=
+RO.	    register ::=
+LBL.	    register ::=
+
+ARG.	    Register ::=
+FLAG.	    Register ::=
+POSITION.   Register ::=
+POSREG.	    Register ::=
+NUMREG.	    Register ::=
+RSR.	    Register ::=
+SREG.	    Register ::=
+TIMER	    Register ::=
+TIMERO.	    Register ::= --timeoverflow
+UALM.	    Register ::=
+VR.	    Register ::= 
+
+EAND.	    Exp  ::= Exp  " AND " EXP1;
+EOR.	    Exp1 ::= EXP1 " OR " EXP2;
+EEQL.	    Exp2 ::= Exp2 "<>" Exp3;
+ENEQL.	    Exp2 ::= Exp2 "!=" Exp3;
+ENOT.	    Exp3 ::= "NOT " Exp3;
+ELT.	    Exp4 ::= Exp4 "<" Exp5;
+ELTE.	    Exp4 ::= Exp4 "<=" Exp5;
+EGT.	    Exp4 ::= Exp4 ">" Exp5;
+EGTE.	    Exp4 ::= Exp4 "=>" Exp5;
+ESUB.	    Exp5 ::= Exp5 "-" Exp6;
+EADD.	    Exp5 ::= Exp5 "+" Exp6;
+EMUL.	    Exp5 ::= Exp5 "*" Exp6;
+EDIV.	    Exp5 ::= Exp5 ("/"|"DIV")+ Exp6;
+EQUO.	    Exp5 ::= Exp5 "MOD" Exp6;
+EREG.  	    Exp16 ::= Register "[" Exp17 "]" ;
+
+
+if_jump.    	 seclection_register ::= "IF" register_stm "," jump;
+if_jump_bool.    seclection_register ::= "IF" register_bool_stm "," jump;
+
+
+-- ABORT ACC AND AP_LD C CALL CONDITION CNT DA DB DISABLE DIV DOWNTO ELSE ENABLE END ENDFOR ERROR_PROG FINDSTR FINE FOR IF INC J JPOS JMP LVC LVCEND L LOCK LPOS MAX_SPEED
+-- MOD MONITOR OFF OFFSET Offset ON OR OVERRIDE PAUSE PAYLOAD POINT_LOGIC PREG PTH PULSE RESUME_PROG RT_LD RUN SELECT SKIP Skip STOP_TRACKING STRLEN SUBSTR TA TB TIMEOUT
+--TO TOOL_OFFSET Tool_Offset UFRAME_NUM UNLOCK UTOOL_NUM VOFFSET VREG WAIT
+ 
+-- CM_MIN DEG_SEC MM MM_SEC MSEC SEC
+-- GP CONFIG UF UT X Y Z W P R MM DEG
+
+
+-- ILLEGAL
+

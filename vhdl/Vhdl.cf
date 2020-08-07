@@ -1,0 +1,241 @@
+entrypoints Design_File ;
+
+comment "--";
+
+rules Design_File ::= [Design_Unit];
+terminator nonempty Design_Unit "";
+
+rules Design_Unit ::= Context_Clause ;
+
+rules Context_Clause ::= [Context_Item];
+[]. [Context_Item] ::= ;
+(:). [Context_Item] ::= Context_Item "" [Context_Item] ;
+--terminator Context_Item "";
+
+rules Context_Item ::= "library" Logical_Name_List T_SEMICOLON; -- Library_Clause;-- | Use_Clause;
+
+rules Use_Clause ::= T_USE Ident "." Ident T_SEMICOLON;--[Selected_Name] T_SEMICOLON;
+separator nonempty Selected_Name "," ;
+rules Selected_Name ::= Prefix T_DOT Suffix;
+
+rules Library_Clause ::= "library" Logical_Name_List T_SEMICOLON; 
+
+rules Logical_Name ::= Identifier;
+
+rules Logical_Name_List ::= [Logical_Name];
+separator nonempty Logical_Name ",";
+
+rules Identifier ::= Basic_Identifier;-- | Extended_Identifier;
+rules Extended_Identifier ::= T_BACKSLASH [Graphic_Character] T_BACKSLASH; 
+rules Basic_Identifier ::= Letter [BasicIdent];
+separator nonempty BasicIdent "";
+rules BasicIdent ::= T_UNDERSCORE | Letter_Or_Digit;
+
+rules Letter ::= Upper_Case_Letter | Lower_Case_Letter;
+
+rules Graphic_Character ::= Basic_Graphic_Character | Lower_Case_Letter | Other_Special_Character ;
+terminator Graphic_Character "" ;
+rules Letter_Or_Digit ::= Letter | Digit;
+
+rules Basic_Graphic_Character ::= Upper_Case_Letter | Digit | Special_Character | Space_Character;
+token Upper_Case_Letter upper;
+token Lower_Case_Letter lower;
+token Digit digit;
+token Space_Character [" \t"];
+rules Opt_UNDERSCORE ::= | T_UNDERSCORE;
+
+{--
+TODO: Need to add more Other Special Characters
+--}
+
+token Special_Character ('"' | '#' | '&' | '.' | '/' | ':' | ';' | '<' | '=' | '>' | '_' | '|');
+token Other_Special_Character ( '!' | '$' | '%' | '\\' | '^' | '{' | '}' | '~'); 
+
+rules Prefix ::= Name;
+
+rules Suffix ::= Simple_Name | Character_Literal | Operator_Symbol | T_ALL;
+
+rules Name ::= Simple_Name | Operator_Symbol |  Character_Literal;
+
+rules Character_Literal ::= T_APOSTROPHE Graphic_Character T_APOSTROPHE; 
+
+rules Simple_Name ::= Identifier;
+
+rules Operator_Symbol ::= String_Literal;
+
+rules String_Literal ::= T_QUOTE [Graphic_Character] T_QUOTE;
+
+
+{-
+	Coalescing the data
+-}
+
+
+{-
+-}
+
+T_ALIAS_RULE. T_ALIAS ::= "alias" ;
+T_ASSERT_RULE. T_ASSERT ::= "assert" ;
+T_ARRAY_RULE. T_ARRAY ::= "array" ;
+T_AFTER_RULE. T_AFTER ::= "after" ;
+T_ALL_RULE. T_ALL ::= "all" ;
+T_IF_RULE. T_IF ::= "if" ;
+T_IS_RULE. T_IS ::= "is" ;
+T_E_RULE. T_E ::= "E" ;
+T_ACCESS_RULE. T_ACCESS ::= "access" ;
+T_INERTIAL_RULE. T_INERTIAL ::= "inertial" ;
+T_OPEN_RULE. T_OPEN ::= "open" ;
+T_OF_RULE. T_OF ::= "of" ;
+T_NEW_RULE. T_NEW ::= "new" ;
+T_BEGIN_RULE. T_BEGIN ::= "begin" ;
+T_END_RULE. T_END ::= "end" ;
+T_EXIT_RULE. T_EXIT ::= "exit" ;
+T_ARCHITECTURE_RULE. T_ARCHITECTURE ::= "architecture" ;
+T_REPORT_RULE. T_REPORT ::= "report" ;
+T_SEVERITY_RULE. T_SEVERITY ::= "severity" ;
+T_RELEASE_RULE. T_RELEASE ::= "release" ;
+T_ATTRIBUTE_RULE. T_ATTRIBUTE ::= "attribute";
+T_USE_RULE. T_USE ::= "use";
+T_FOR_RULE. T_FOR ::= "for";
+T_BLOCK_RULE. T_BLOCK ::= "block";
+T_WHEN_RULE. T_WHEN ::= "when";
+T_WAIT_RULE. T_WAIT ::= "wait";
+T_WHILE_RULE. T_WHILE ::= "while";
+T_CASE_RULE. T_CASE ::= "case";
+T_GENERATE_RULE. T_GENERATE ::= "generate";
+T_OTHERS_RULE. T_OTHERS ::= "others";
+T_SHARED_RULE. T_SHARED ::= "shared";
+T_VUNIT_RULE. T_VUNIT ::= "vunit";
+T_BAR_RULE. T_BAR ::= "|";
+T_COMPONENT_RULE. T_COMPONENT ::= "component";
+T_POSTPONED_RULE. T_POSTPONED ::= "postponed";
+T_GUARDED_RULE. T_GUARDED ::= "guarded";
+T_WITH_RULE. T_WITH ::= "with";
+T_SELECT_RULE. T_SELECT ::= "select";
+T_UNTIL_RULE. T_UNTIL ::= "until";
+T_ELSE_RULE. T_ELSE ::= "else";
+T_RANGE_RULE. T_RANGE ::= "range";
+T_THEN_RULE. T_THEN ::= "then";
+T_ELSIF_RULE. T_ELSIF ::= "elsif";
+T_FORCE_RULE. T_FORCE ::= "force";
+T_CONFIGURATION_RULE. T_CONFIGURATION ::= "configuration";
+T_CONSTANT_RULE. T_CONSTANT ::= "constant";
+T_CONTEXT_RULE. T_CONTEXT ::= "context";
+T_TRANSPORT_RULE. T_TRANSPORT ::= "transport";
+T_REJECT_RULE. T_REJECT ::= "reject";
+T_TO_RULE. T_TO ::= "to";
+T_DOWNTO_RULE. T_DOWNTO ::= "downto";
+T_DISCONNECT_RULE. T_DISCONNECT ::= "disconnect";
+T_ENTITY_RULE. T_ENTITY ::= "entity";
+T_PROCEDURE_RULE. T_PROCEDURE ::= "procedure";
+T_FUNCTION_RULE. T_FUNCTION ::= "function";
+T_LIBRARY_RULE. T_LIBRARY ::= "library";
+T_PACKAGE_RULE. T_PACKAGE ::= "package";
+T_PORT_RULE. T_PORT ::= "port";
+T_TYPE_RULE. T_TYPE ::= "type";
+T_SUBTYPE_RULE. T_SUBTYPE ::= "subtype";
+T_SIGNAL_RULE. T_SIGNAL ::= "signal";
+T_VARIABLE_RULE. T_VARIABLE ::= "variable";
+T_LABEL_RULE. T_LABEL ::= "label";
+T_LITERAL_RULE. T_LITERAL ::= "literal";
+T_UNITS_RULE. T_UNITS ::= "units";
+T_PROTECTED_RULE. T_PROTECTED ::= "protected";
+T_GROUP_RULE. T_GROUP ::= "group";
+T_FILE_RULE. T_FILE ::= "file";
+T_PROPERTY_RULE. T_PROPERTY ::= "property";
+T_SEQUENCE_RULE. T_SEQUENCE ::= "sequence";
+T_PROCESS_RULE. T_PROCESS ::= "process";
+T_NEXT_RULE. T_NEXT ::= "next";
+T_ABS_RULE. T_ABS ::= "abs";
+T_NOT_RULE. T_NOT ::= "not";
+T_IN_RULE. T_IN ::= "in";
+T_OUT_RULE. T_OUT ::= "out";
+T_INOUT_RULE. T_INOUT ::= "inout";
+T_BUFFER_RULE. T_BUFFER ::= "buffer";
+T_LINKAGE_RULE. T_LINKAGE ::= "linkage";
+T_PURE_RULE. T_PURE ::= "pure";
+T_IMPURE_RULE. T_IMPURE ::= "impure";
+T_RETURN_RULE. T_RETURN ::= "return";
+T_PARAMETER_RULE. T_PARAMETER ::= "parameter";
+T_GENERIC_RULE. T_GENERIC ::= "generic";
+T_MAP_RULE. T_MAP ::= "map";
+T_DEFAULT_RULE. T_DEFAULT ::= "default";
+T_RECORD_RULE. T_RECORD ::= "record";
+T_BODY_RULE. T_BODY ::= "body";
+T_LOOP_RULE. T_LOOP ::= "loop";
+T_BUS_RULE. T_BUS ::= "bus";
+T_REGISTER_RULE. T_REGISTER ::= "register";
+T_NULL_RULE. T_NULL ::= "null";
+T_AND_RULE. T_AND ::= "and";
+T_OR_RULE. T_OR ::= "or";
+T_XOR_RULE. T_XOR ::= "xor";
+T_NAND_RULE. T_NAND ::= "nand";
+T_NOR_RULE. T_NOR ::= "nor";
+T_XNOR_RULE. T_XNOR ::= "xnor";
+T_ON_RULE. T_ON ::= "on";
+T_AT_RULE. T_AT ::= "@";
+T_UNAFFECTED_RULE. T_UNAFFECTED ::= "unaffected";
+
+T_B_RULE. T_B ::= "B";
+T_O_RULE. T_O ::= "O";
+T_X_RULE. T_X ::= "X";
+T_UB_RULE. T_UB ::= "UB";
+T_UO_RULE. T_UO ::= "UO";
+T_UX_RULE. T_UX ::= "UX";
+T_SB_RULE. T_SB ::= "SB";
+T_SO_RULE. T_SO ::= "SO";
+T_SX_RULE. T_SX ::= "SX";
+T_D_RULE. T_D ::= "D";
+
+T_SLL_RULE. T_SLL ::= "SLL";
+T_SRL_RULE. T_SRL ::= "SRL";
+T_SLA_RULE. T_SLA ::= "SLA";
+T_SRA_RULE. T_SRA ::= "SRA";
+T_ROL_RULE. T_ROL ::= "ROL";
+T_ROR_RULE. T_ROR ::= "ROR";
+
+T_APOSTROPHE_RULE. T_APOSTROPHE ::= "'";
+T_TICK_RULE. T_TICK ::= "`";
+T_CARROT_RULE. T_CARROT ::= "^";
+
+T_LPARENTHESIS_RULE. T_LPARENTHESIS ::= "(" ;
+T_RPARENTHESIS_RULE. T_RPARENTHESIS ::= ")" ;
+T_QUESTIONMARK_RULE. T_QUESTIONMARK ::= "?" ;
+T_DOUBLEQUESTIONMARK_RULE. T_DOUBLEQUESTIONMARK ::= "??" ;
+T_PLUS_RULE. T_PLUS ::= "+" ;
+T_MINUS_RULE. T_MINUS ::= "-" ;
+T_MULTIPLY_RULE. T_MULTIPLY ::= "*" ;
+T_DIVIDE_RULE. T_DIVIDE ::= "/" ;
+T_MOD_RULE. T_MOD ::= "mod" ;
+T_REM_RULE. T_REM ::= "rem" ;
+T_AMPERSAND_RULE. T_AMPERSAND ::= "&" ;
+T_VARASSIGN_RULE. T_VARASSIGN ::= ":=" ;
+T_LESYMBOL_RULE. T_LESYMBOL ::= "<=" ;
+T_LTSYMBOL_RULE. T_LTSYMBOL ::= "<" ;
+T_DOUBLE_LTSYMBOL_RULE. T_DOUBLE_LTSYMBOL ::= "<<" ;
+T_DOUBLE_GTSYMBOL_RULE. T_DOUBLE_GTSYMBOL ::= ">>" ;
+T_EQUAL_RULE. T_EQUAL ::= "=" ;
+T_NOTEQUAL_RULE. T_NOTEQUAL ::= "/=" ;
+T_GTSYMBOL_RULE. T_GTSYMBOL ::= ">" ;
+T_GESYMBOL_RULE. T_GESYMBOL ::= ">=" ;
+T_DIAMOND_RULE. T_DIAMOND ::= "<>" ;
+T_DOUBLE_ASTERISK_RULE. T_DOUBLE_ASTERISK ::= "**" ;
+
+
+
+T_QUESTIONMARK_EQUAL_RULE. T_QUESTIONMARK_EQUAL ::= "?=" ;
+T_QUESTIONMARK_NOTEQUAL_RULE. T_QUESTIONMARK_NOTEQUAL ::= "?/=" ;
+T_QUESTIONMARK_LTSYMBOL_RULE. T_QUESTIONMARK_LTSYMBOL ::= "?<" ;
+T_QUESTIONMARK_GTSYMBOL_RULE. T_QUESTIONMARK_GTSYMBOL ::= "?>" ;
+T_QUESTIONMARK_GESYMBOL_RULE. T_QUESTIONMARK_GESYMBOL ::= "?>=" ;
+T_QUESTIONMARK_LESYMBOL_RULE. T_QUESTIONMARK_LESYMBOL ::= "?<=" ;
+
+T_QUOTE_RULE. T_QUOTE ::= "\"" ;
+T_BACKSLASH_RULE. T_BACKSLASH ::= "\\" ;
+T_POUND_RULE. T_POUND ::= "#" ;
+T_ARROW_RULE. T_ARROW ::= "=>" ;
+T_UNDERSCORE_RULE. T_UNDERSCORE ::= "_" ;
+T_COLON_RULE. T_COLON ::= ":" ;
+T_DOT_RULE. T_DOT ::= "." ;
+T_SEMICOLON_RULE. T_SEMICOLON ::= ";" ;
+

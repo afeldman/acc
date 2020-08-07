@@ -1,0 +1,11 @@
+WSGrammar . WS ::= [Stm];
+
+SPush. Stm ::= "  ";
+SDup.  Stm ::= " \n\t"; 
+
+[].    [Stm] ::= ;
+(:[]). [Stm] ::= Stm ;
+(:).   [Stm] ::= Stm[Stm] ;
+
+
+comment "//" ;

@@ -1,0 +1,24 @@
+JsonGr. Json ::= Value;
+
+ValObj. Value ::= Object ;
+ValArr. Value ::= Array ;
+ValStr. Value ::= String ;
+ValInt. Value ::= Integer ;
+ValDou. Value ::= Double ;
+ValTru. Value ::= "true" ;
+ValFal. Value ::= "false" ;
+ValNil. Value ::= "null" ;
+
+ObjArray. Array ::= "[" [Value] "]";
+
+[].    [Value] ::= ;
+(:[]). [Value] ::= Value ;
+(:).   [Value] ::= Value "," [Value] ;
+
+ObjMain. Object ::= "{" [Element] "}";
+
+ElemMain. Element ::= String ":" Value ;
+
+[].    [Element] ::= ;
+(:[]). [Element] ::= Element ;
+(:).   [Element] ::= Element "," [Element] ;
