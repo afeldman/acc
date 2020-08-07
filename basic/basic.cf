@@ -44,4 +44,3 @@ OOr.      Op  ::= "|" ;
 
 UOMinus.  UOp ::= "-" ;
 UONot.    UOp ::= "!" ;
-
