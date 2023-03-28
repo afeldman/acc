@@ -2,6 +2,9 @@
 --
 -- a karel program example:
 --
+-- Author: Anton Feldmann
+-- Version: 0.1.0
+-- Date: 2023-03-28
 {-
         PROGRAM foo
         CONST
@@ -39,10 +42,21 @@
 comment "--";
 comment "{-" "-}";     -- haskell multiline comment
 
--- each programm starts with a programm identifier
+--
+-- each programm starts with a programm identifier with an optional line break (semikolon or new line).
+-- than there will be an optional directive block, an optional declaration block before the main function BEGIN
+-- between the BEGIN and END keyword there will be an optional statement block and the block will be closed with the
+-- identifier of the main function.
+--
+-- i like to split the declaration block from the routine definition block.
+-- therefore the programm ends with the implementation of the routines from time declaration block
+-- each routine in the routine definition block starts with the keyword ROUTINE and the identifier of the routine
 --
 KarelGrammer. Karel ::= "PROGRAM" Ident OptLineEnd [DirectiveBlock] [DeclBlock] "BEGIN" [Stm] "END" Ident [RoutineDefinitionBlock] ;
 
+-- this is the meta information block and is important for the robot not for the karel programm itself.
+-- i placed it here because it is the first block in the karel program and i want to be comapatible with the
+-- robot programs
 DirAlphabet. DirectiveBlock ::= "%ALPHABETIZE" ;
 DirCMOS.     DirectiveBlock ::= "%CMOSVARS" ;
 DirCRT.      DirectiveBlock ::= "%CRTDEVICE" ;
@@ -73,6 +87,16 @@ ECTBCom.        ErrorCommandTPBlock ::= "COMMAND" "+" "TPENABLE" ;
 ECTBErr.        ErrorCommandTPBlock ::= "ERROR" "+" "TPENABLE" ;
 ECTBAnable.     ErrorCommandTPBlock ::= "ERROR" "+" "COMMAND" "+" "TPENABLE" ;
 
+
+----------------------------------------------------------
+-- declaration block
+----------------------------------------------------------
+-- a declaration block contains of the following blocks
+--
+-- constant block
+-- type block
+-- variable block
+-- routine decleration block
 DeclConst.      DeclBlock ::= ConstDeclBlock ;
 DeclType.       DeclBlock ::= TypeDeclBlock ;
 DeclVar.        DeclBlock ::= VarDeclBlock ;
@@ -80,18 +104,23 @@ DeclRoutine.    DeclBlock ::= RoutineDeclBlock ;
 [].  [DeclBlock] ::= ;
 (:). [DeclBlock] ::= DeclBlock [DeclBlock] ;
 
--- declaration of Constant values together in one Block starting with the CONST token
+-- first the constant block. 
+-- the constant block starts with the 'CONST' keyword followed by a list of constant declarations
+-- the list is seperated by optional linebrakes (semicolon or new line)
+-- each constant declaration starts with an identifier followed by an equal sign and a literal and ends with an optional linebreak
 CDB. ConstDeclBlock ::= "CONST" OptLineEnd [ConstDecl] ;
-CDIdent.        ConstDecl ::= Ident "=" Ident ;
-CDLiteral.      ConstDecl ::= Ident "=" Literal ;
+CDIdent.        ConstDecl ::= Ident "=" Ident OptLineEnd ;
+CDLiteral.      ConstDecl ::= Ident "=" Literal OptLineEnd;
 [].    [ConstDecl] ::= ;
 (:).   [ConstDecl] ::= ConstDecl [ConstDecl] ;
 
--- declaration of the Type Block. Here are the place to define user specific types
+-- declaration of the Type Block. 
+-- a type block starts with the 'TYPE' keyword followed by an optional linebreak and close with a list of type declarations
+-- a type decleration can be a known type like integer, char, boolean or double or a user defined type
 TCB. TypeDeclBlock ::= "TYPE" OptLineEnd [TypeDecl];
-TDeclU.  TypeDecl ::= Ident "FROM" Ident UserType;
-TUser.  TypeDecl ::= Ident "=" UserType ;
-TUserD. TypeDecl ::= UserType ;
+TDeclU.  TypeDecl ::= Ident "FROM" Ident UserType OptLineEnd;
+TUser.  TypeDecl ::= Ident "=" UserType OptLineEnd;
+TUserD. TypeDecl ::= UserType OptLineEnd;
 --[].    [TypeDecl] ::= ;
 (:[]). [TypeDecl] ::= TypeDecl ;
 (:).   [TypeDecl] ::= TypeDecl [TypeDecl] ;
@@ -434,18 +463,21 @@ ReturnArrayAster.   ReturnArrayIndex ::= "*" ;
 (:[]). [ReturnArrayIndex] ::= ReturnArrayIndex;
 (:).   [ReturnArrayIndex] ::= ReturnArrayIndex "," [ReturnArrayIndex] ;
 
+-- sign or unsigned that is the question ;)
 SignPlus.       Sign ::= "+" ;
 SignMinus.      Sign ::= "-" ;
 SignEmpty.      Sign ::= Empty ;
 
--- change to unsigned
+-- Literals are integer doubles and quoted strings
 LiteralInteger. Literal ::= Integer ;
 LiteralQuoted.  Literal ::= QuotedString ;
 LiteralDouble.  Literal ::= Double ;
 
+-- constants are literals or identifiers
 ConstLiteral.   Constant ::= Literal ;
 ConstIdent.     Constant ::= Ident ;
 
+-- the optinal line end is a semicolon or a new line
 OptLineEnd.      OptLineEnd ::= LineEnd ;
 OptLineEndEmpty. OptLineEnd ::= Empty ;
 
