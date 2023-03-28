@@ -15,7 +15,7 @@ ROUTINE do_something_too () : Integer
 BEGIN
    xl = 2
    PAUSE
-   RETURN
+   RETURN(a)
 END bar
 
 ROUTINE do_something_too

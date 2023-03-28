@@ -4,21 +4,23 @@ CONST
         b = 2
 TYPE
         test FROM bare
-        v = STRUCTURE
+        STRUCTURE s1
                test: INTEGER
         ENDSTRUCTURE
 
-        w FROM test2 = STRUCTURE
-               test: INTEGER
+        STRUCTURE s2
+               test: STRING
         ENDSTRUCTURE
+
 VAR
         var1: v
         var2: test
         var3: INTEGER
         var4, var5: CHAR
+        w FROM test2 : s1
 
-ROUTINE do_something (l: BYTE)
-ROUTINE do_something2 ( a: INTEGER = 60; b: String = "")
+ROUTINE do_something (l: INTEGER)
+ROUTINE do_something2 ( a: INTEGER = 60; b: STRING = "")
 ROUTINE do_something_too () : integer FROM bar
 
 BEGIN

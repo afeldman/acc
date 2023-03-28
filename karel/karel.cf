@@ -326,31 +326,31 @@ SSWaitEmapty.   Nwait    ::= Empty ;
 ------------------------------------ Expressions ---------------------------------
 -- TODO: find the right expressions for the grammer. the list is wrong
 EBrack.   Expression  ::= "(" Expression ")" ;
-EEqual.   Expression  ::= Expression "="   Expression1 ;
-ENEqual.  Expression  ::= Expression "<>"  Expression1 ;
-ELess.    Expression  ::= Expression "<"   Expression1 ;
-ELeq.     Expression  ::= Expression "<="  Expression1 ;
-Egret.    Expression  ::= Expression ">"   Expression1 ;
-Egeq.     Expression  ::= Expression ">="  Expression1 ;
-Esp.      Expression  ::= Expression ">=<" Expression1 ;
-EAdd.     Expression1 ::= Expression "+"   Expression2 ;
-ESub.     Expression1 ::= Expression "-"   Expression2 ;
-EOR.      Expression1 ::= Expression "OR"  Expression2 ;
-EPlus.    Expression1 ::= "+"                   Expression2 ;
-EMinus.   Expression1 ::= "-"                   Expression2 ;
-EMul.     Expression2 ::= Expression    "*"     Expression3 ;
-EAdiv.    Expression2 ::= Expression    "/"     Expression3 ;
-EAnd.     Expression2 ::= Expression    "AND"   Expression3 ;
-EMOD.     Expression2 ::= Expression    "MOD"   Expression3 ;
-EDiv.     Expression2 ::= Expression    "DIV"   Expression3 ;
-ENot.     Expression3 ::= Expression    "NOT"   Expression4 ;
-EDot.     Expression3 ::= Expression    ":"     Expression4 ;
-EAt.      Expression3 ::= Expression    "@"     Expression4 ;
-EHash.    Expression3 ::= Expression    "#"     Expression4 ;
-EIdent.   Expression4 ::= Ident;
-EQString. Expression4 ::= Text ;
-EDouble.  Expression4 ::= Double ;
-EInt.     Expression4 ::= Integer ;
+EEqual.   Expression  ::= Expression "="   Expression ;
+ENEqual.  Expression  ::= Expression "<>"  Expression ;
+ELess.    Expression  ::= Expression "<"   Expression ;
+ELeq.     Expression  ::= Expression "<="  Expression ;
+Egret.    Expression  ::= Expression ">"   Expression ;
+Egeq.     Expression  ::= Expression ">="  Expression ;
+Esp.      Expression  ::= Expression ">=<" Expression ;
+EAdd.     Expression ::= Expression "+"   Expression ;
+ESub.     Expression ::= Expression "-"   Expression ;
+EOR.      Expression ::= Expression "OR"  Expression ;
+EPlus.    Expression ::= "+"                   Expression ;
+EMinus.   Expression ::= "-"                   Expression ;
+EMul.     Expression ::= Expression    "*"     Expression ;
+EAdiv.    Expression ::= Expression    "/"     Expression ;
+EAnd.     Expression ::= Expression    "AND"   Expression ;
+EMOD.     Expression ::= Expression    "MOD"   Expression ;
+EDiv.     Expression ::= Expression    "DIV"   Expression ;
+ENot.     Expression ::= Expression    "NOT"   Expression ;
+EDot.     Expression ::= Expression    ":"     Expression ;
+EAt.      Expression ::= Expression    "@"     Expression ;
+EHash.    Expression ::= Expression    "#"     Expression ;
+EIdent.   Expression ::= Ident;
+EQString. Expression ::= Text ;
+EDouble.  Expression ::= Double ;
+EInt.     Expression ::= Integer ;
 
 (:[]).   [Expression] ::= Expression ;
 (:).     [Expression] ::= Expression "," [Expression];
@@ -398,30 +398,17 @@ PDTPath.        ParameterDataTypes ::= "PATH" PathDataType ;
 PDTCommon.      ParameterDataTypes ::= "COMMON_ASSOC" ;
 PDTPos.         ParameterDataTypes ::= PositionDataTypes "IN" "GROUP" "[" Integer "]" ;
 PDTString.      ParameterDataTypes ::= "STRING" ;
-PDTArray.       ParameterDataTypes ::= "ARRAY" "[" "ARRAY" "[" [ReturnArrayIndex] "]" "OF" StructuredArrayType ;
+PDTArray.       ParameterDataTypes ::= "ARRAY" "[" DataTypes "]" "OF" StructuredArrayType ;
 
 -- datatypes
-DTIdent.        DataTypes ::= Ident ;
-DTChar.         DataTypes ::= Char ;
-DTInt.          DataTypes ::= "INTEGER" ;
-DTReal.         DataTypes ::= "REAL" ;
-DTBool.         DataTypes ::= "BOOLEAN" ;
-DTVector.       DataTypes ::= "VECTOR" ;
-DTVis.          DataTypes ::= "VIS_PROCESS" ;
-DTModel.        DataTypes ::= "MODEL" ;
-DTCam.          DataTypes ::= "CAM_SETUP" ;
-DTFile.         DataTypes ::= "FILE" ;
-DTConf.         DataTypes ::= "CONFIG" ;
-DTcommon.       DataTypes ::= "COMMON_ASSOC" ;
-DTPos.          DataTypes ::= PositionDataTypes "IN" "GROUP" "[" Integer "]" ;
 DTString.       DataTypes ::= "STRING" "[" Integer "]" ;
-DTPath.         DataTypes ::= "PATH" PathDataType ;
 DTArray.        DataTypes ::= "ARRAY" "[" [ArrayIndexing] "]" "OF" StructuredArrayType ;
+DTStruct.       DataTypes ::= StructuredArrayType ;
+DTParam.        DataTypes ::= ParameterDataTypes ;
 
--- structured array type
-SATDT.    StructuredArrayType ::= DataTypes;
-SATByte.  StructuredArrayType ::= "BYTE" ;
+-- structured array typeStructuredArrayType
 SATShort. StructuredArrayType ::= "SHORT" ;
+SATByte.   StructuredArrayType ::= "BYTE" ;
 
 -- path data type
 PathDTHeader.    PathDataType ::= "PATH HEADER" "=" Ident  ;
