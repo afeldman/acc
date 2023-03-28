@@ -64,7 +64,7 @@ DirNoBusy.   DirectiveBlock ::= "%NOBUSYLAMP" ;
 DirNoLock.   DirectiveBlock ::= "%NOLOCKGROUP" ;
 DirNoPauseS. DirectiveBlock ::= "%NOPAUSESHFT" ;
 DirRPMotion. DirectiveBlock ::= "%TPMOTION" ;
-DirComment.  DirectiveBlock ::= "%COMMENT" "=" QuotedString ;
+DirComment.  DirectiveBlock ::= "%COMMENT" "=" Text ;
 DirDefGroup. DirectiveBlock ::= "%DEFGROUP" "=" Integer ;
 DirDelay.    DirectiveBlock ::= "%DELAY" "=" Integer ;
 DirProp.     DirectiveBlock ::= "%PRIORITY" "=" Integer ;
@@ -74,7 +74,7 @@ DirEnv.      DirectiveBlock ::= "%ENVIRONMENT" "=" Ident ;
 DirLock.     DirectiveBlock ::= "%LOCKGROUP" "=" [ArrayIndexing] ;
 DirNoAbort.  DirectiveBlock ::= "%NOABORT" "=" ErrorCommandBlock ;
 DirNoPause.  DirectiveBlock ::= "%NOPAUSE" "=" ErrorCommandTPBlock ;
-DirInclude.  DirectiveBlock ::= "%INCLUDE" QuotedString ;
+DirInclude.  DirectiveBlock ::= "%INCLUDE" Text ;
 [].    [DirectiveBlock] ::= ;
 (:).   [DirectiveBlock] ::= DirectiveBlock [DirectiveBlock] ;
 
@@ -110,13 +110,12 @@ DeclRoutine.    DeclBlock ::= RoutineDeclBlock ;
 -- each constant declaration starts with an identifier followed by an equal sign and a literal and ends with an optional linebreak
 CDB. ConstDeclBlock ::= "CONST" OptLineEnd [ConstDecl] ;
 CDIdent.        ConstDecl ::= Ident "=" Ident OptLineEnd ;
-CDLiteral.      ConstDecl ::= Ident "=" Literal OptLineEnd;
+CDLiteral.      ConstDecl ::= Ident "=" Literal OptLineEnd ;
 [].    [ConstDecl] ::= ;
 (:).   [ConstDecl] ::= ConstDecl [ConstDecl] ;
 
 -- declaration of the Type Block. 
 -- a type block starts with the 'TYPE' keyword followed by an optional linebreak and close with a list of type declarations
--- a type decleration can be a known type like integer, char, boolean or double or a user defined type
 TCB. TypeDeclBlock ::= "TYPE" OptLineEnd [TypeDecl];
 TDeclU.  TypeDecl ::= Ident "FROM" Ident UserType OptLineEnd;
 TUser.  TypeDecl ::= Ident "=" UserType OptLineEnd;
@@ -239,14 +238,14 @@ SSignal.        Stm ::= "SIGNAL" "EVENT" "[" [ArrayIndexing] "]" ;
 SCancel.        Stm ::= "CANCEL";
 SCancelFile.    Stm ::= "CANCEL" "FILE" Ident ;
 SCancelGroup.   Stm ::= "CANCEL" Groups;
-SCallparamExp.  Stm ::= Ident "(" Expression ")" ;
+SCallparamExp.  Stm ::= Ident "(" [Expression] ")" ;
 SForTo.         Stm ::= "FOR" Ident "=" Integer "TO" Integer "DO" [Stm] "ENDFOR" ;
 SForDownTo.     Stm ::= "FOR" Ident "=" Integer "DOWNTO" Integer "DO" [Stm] "ENDFOR" ;
 SGoTo.          Stm ::= "GOTO" Ident ;
 SGo_To.         Stm ::= "GO" "TO" Ident ;
 SHold.          Stm ::= "HOLD" ;
 SHoleGroup.     Stm ::= "HOLD" Groups ;
-SIfThen.        Stm ::= "IF" Expression "THEN" [Stm] "ENDIF";
+SIfThen.        Stm ::= "IF" Expression "THEN" [Stm] "ENDIF" ;
 SIfThenElse.    Stm ::= "IF" Expression "THEN" [Stm] "ELSE" [Stm] "EDNIF" ;
 SPause.         Stm ::= "PAUSE" ;
 SPauseProgram.  Stm ::= "PAUSE" "PROGRAM" "[" [ArrayIndexing] "]" ;
@@ -284,7 +283,7 @@ GCLOr.          GlobalConditionList ::= GlobalCondition "OR" GlobalCondition ;
 GroupBase.      Groups ::=  "GROUP" "[" [ArrayIndexing] "]";
 
 [].    [Stm] ::= ;
-(:).   [Stm] ::= Stm [Stm] ;
+(:).   [Stm] ::= Stm [Stm];
 
 WaitSelectGC.   WaitSelect ::= GlobalCondition ;
 WaitSelectAND.  WaitSelect ::= GlobalCondition "AND" GlobalCondition ;
@@ -325,18 +324,18 @@ SSWaitEmapty.   Nwait    ::= Empty ;
 
 
 ------------------------------------ Expressions ---------------------------------
-EIBrack.  Expression  ::= Ident "(" Expression ")";
+-- TODO: find the right expressions for the grammer. the list is wrong
 EBrack.   Expression  ::= "(" Expression ")" ;
-EEqual.   Expression  ::= Expression    "="     Expression1 ;
-ENEqual.  Expression  ::= Expression    "<>"    Expression1 ;
-ELess.    Expression  ::= Expression    "<"     Expression1 ;
-ELeq.     Expression  ::= Expression    "<="    Expression1 ;
-Egret.    Expression  ::= Expression    ">"     Expression1 ;
-Egeq.     Expression  ::= Expression    ">="    Expression1 ;
-Esp.      Expression  ::= Expression    ">=<"   Expression1 ;
-EAdd.     Expression1 ::= Expression    "+"     Expression2 ;
-ESub.     Expression1 ::= Expression    "-"     Expression2 ;
-EOR.      Expression1 ::= Expression    "OR"    Expression2 ;
+EEqual.   Expression  ::= Expression "="   Expression1 ;
+ENEqual.  Expression  ::= Expression "<>"  Expression1 ;
+ELess.    Expression  ::= Expression "<"   Expression1 ;
+ELeq.     Expression  ::= Expression "<="  Expression1 ;
+Egret.    Expression  ::= Expression ">"   Expression1 ;
+Egeq.     Expression  ::= Expression ">="  Expression1 ;
+Esp.      Expression  ::= Expression ">=<" Expression1 ;
+EAdd.     Expression1 ::= Expression "+"   Expression2 ;
+ESub.     Expression1 ::= Expression "-"   Expression2 ;
+EOR.      Expression1 ::= Expression "OR"  Expression2 ;
 EPlus.    Expression1 ::= "+"                   Expression2 ;
 EMinus.   Expression1 ::= "-"                   Expression2 ;
 EMul.     Expression2 ::= Expression    "*"     Expression3 ;
@@ -349,18 +348,18 @@ EDot.     Expression3 ::= Expression    ":"     Expression4 ;
 EAt.      Expression3 ::= Expression    "@"     Expression4 ;
 EHash.    Expression3 ::= Expression    "#"     Expression4 ;
 EIdent.   Expression4 ::= Ident;
+EQString. Expression4 ::= Text ;
 EDouble.  Expression4 ::= Double ;
 EInt.     Expression4 ::= Integer ;
-EQString. Expression4 ::= QuotedString ;
+
+(:[]).   [Expression] ::= Expression ;
+(:).     [Expression] ::= Expression "," [Expression];
+
 
 ------------------------------------ types ---------------------------------
 -- user types
 UserTypeDT.        UserType ::= Ident "=" DataTypes;
-UserTypeStruct.    UserType ::= "STRUCTURE" OptLineEnd [VarDecl] "ENDSTRUCTURE" ;
-
---Field. Field ::= Ident ":" StructuredArrayType ;
---[].    [Field] ::= ;
---(:).   [Field] ::= Field [Field] ;
+UserTypeStruct.    UserType ::= "STRUCTURE" Ident OptLineEnd [VarDecl] "ENDSTRUCTURE" ;
 
 -- EmptyType
 EmpyType. Empty ::= ;
@@ -470,17 +469,19 @@ SignEmpty.      Sign ::= Empty ;
 
 -- Literals are integer doubles and quoted strings
 LiteralInteger. Literal ::= Integer ;
-LiteralQuoted.  Literal ::= QuotedString ;
 LiteralDouble.  Literal ::= Double ;
+LiteralQuoted.  Literal ::= Text;
+
+-- txt literas is string or char
+rules Text ::= String | QuotedString ;
 
 -- constants are literals or identifiers
 ConstLiteral.   Constant ::= Literal ;
 ConstIdent.     Constant ::= Ident ;
 
 -- the optinal line end is a semicolon or a new line
-OptLineEnd.      OptLineEnd ::= LineEnd ;
-OptLineEndEmpty. OptLineEnd ::= Empty ;
+rules    OptLineEnd ::= LineEnd | Empty;
 
 -- token Path (letter|'/')+ ;
-token QuotedString '\'' ((char - ["'\\"]) | ('\\' ["'\\nt"]))* '\'';
+token QuotedString '\'' ((char - ["'\\"]) | ('\\' ["'\\nt"]) )* '\'';
 token LineEnd ((';'|'\n')+) ;

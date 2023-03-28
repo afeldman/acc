@@ -25,7 +25,7 @@ CONST
 TYPE
  a = REAL
 
- b = STRUCTURE
+ b = STRUCTURE test
    a : INTEGER
  ENDSTRUCTURE
 

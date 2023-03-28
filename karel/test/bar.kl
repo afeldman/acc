@@ -1,7 +1,10 @@
-PROGRAM bar     
+PROGRAM bar
+CONST
+        a = 1
+        b = "Test"
 TYPE
         STRUCTURE test
-               a : INTEGER
+               var_a : INTEGER
         ENDSTRUCTURE
 VAR
         var2: test
@@ -10,13 +13,14 @@ VAR
 ROUTINE do_something_too () : Integer
 
 BEGIN
-
+   xl = 2
+   PAUSE
+   RETURN
 END bar
 
 ROUTINE do_something_too
 CONST
   a = 1
 BEGIN
-    print(a)
-    return (a)
+   RETURN
 END do_something_too
