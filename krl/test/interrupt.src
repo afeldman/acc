@@ -1,0 +1,41 @@
+&ACCESS RVP
+DEF interrupt_example()
+  ; KRL Interrupt Handling Example
+  
+  DECL INT interrupt_flag
+  
+  ; Declare interrupt (number, condition, handler)
+  INTERRUPT DECL 1 WHEN $IN[10] == TRUE DO emergency_stop()
+  INTERRUPT DECL 2 WHEN $IN[11] == TRUE DO safety_check()
+  
+  ; Enable interrupts
+  INTERRUPT ON 1
+  INTERRUPT ON 2
+  
+  ; Main program loop
+  LOOP
+    PTP {A1 0.0, A2 -90.0, A3 90.0, A4 0.0, A5 0.0, A6 0.0}
+    WAIT SEC 0.5
+    
+    IF interrupt_flag > 0 THEN
+      EXIT
+    ENDIF
+  ENDLOOP
+  
+  ; Disable interrupts
+  INTERRUPT OFF 1
+  INTERRUPT OFF 2
+  
+END
+
+DEF emergency_stop()
+  ; Emergency stop handler
+  HALT
+  $OUT[100] = TRUE
+END
+
+DEF safety_check()
+  ; Safety check handler
+  interrupt_flag = 1
+  PAUSE
+END

@@ -3,93 +3,115 @@
 
 -- comments are maked with the "exclamation marks" 
 comment "!";
-comment "//"; --remark
+comment "//";
 
 -- each TPE starts with the prog token and a name.
-PROG. 	     section ::=
-ATTR. 	     section ::=
-APPL.        section ::=
-MN.          section ::=
-POS.         section ::=
-END.         section ::=
+TPProgram. Program ::= [Section] ;
 
--- TYPES
-IDENT.  type_section ::=
-STRING.	type_section ::=
-INT.    type_section ::=
-REAL.   type_section ::=
+SProg.  Section ::= "PROG" Ident ;
+SAttr.  Section ::= "ATTR" [Attr] ;
+SAppl.  Section ::= "APPL" Ident ;
+SMn.    Section ::= "MN" Integer ;
+SPos.   Section ::= "POS" [Position] ;
+SEnd.   Section ::= "END" ;
+
+[].    [Section] ::= ;
+(:[]). [Section] ::= Section ;
+(:).   [Section] ::= Section [Section] ;
 
 -- ATTRIBUTES
-TCD.            attr ::=
-TIME.		attr ::=
-DATE.		attr ::=
-OWNER		attr ::=
-CREATE.		attr ::=
-ASCBIN.		attr ::=
-VERSION.	attr ::=
-COMMENT.	attr ::=
-PROTECT.	attr ::=
-MODIFIED.	attr ::=
-FILE_NAME.	attr ::=
-PROG_SIZE.	attr ::=
-LINE_COUNT.	attr ::=
-TIME_SLICE.	attr ::=
-READ_WRITE.	attr ::=
-STACK_SIZE.	attr ::=
-MEMORY_SIZE.	attr ::=
-CONTROL_CODE.	attr ::=
-PAUSE_REQUEST.	attr ::=
-TASK_PRIORITY.	attr ::=
-DEFAULT_GROUP.	attr ::=
-BUSY_LAMP_OFF.	attr ::=
-ABORT_REQUEST.	attr ::=
+ATCD.            Attr ::= "TCD" Ident ;
+ATime.           Attr ::= "TIME" String ;
+ADate.           Attr ::= "DATE" String ;
+AOwner.          Attr ::= "OWNER" String ;
+ACreate.         Attr ::= "CREATE" String ;
+AAscBin.         Attr ::= "ASCBIN" Ident ;
+AVersion.        Attr ::= "VERSION" Integer ;
+AComment.        Attr ::= "COMMENT" String ;
+AProtect.        Attr ::= "PROTECT" Ident ;
+AModified.       Attr ::= "MODIFIED" String ;
+AFileName.       Attr ::= "FILE_NAME" String ;
+AProgSize.       Attr ::= "PROG_SIZE" Integer ;
+ALineCount.      Attr ::= "LINE_COUNT" Integer ;
+ATimeSlice.      Attr ::= "TIME_SLICE" Integer ;
+AReadWrite.      Attr ::= "READ_WRITE" Ident ;
+AStackSize.      Attr ::= "STACK_SIZE" Integer ;
+AMemorySize.     Attr ::= "MEMORY_SIZE" Integer ;
+AControlCode.    Attr ::= "CONTROL_CODE" Integer ;
+APauseRequest.   Attr ::= "PAUSE_REQUEST" Ident ;
+ATaskPriority.   Attr ::= "TASK_PRIORITY" Integer ;
+ADefaultGroup.   Attr ::= "DEFAULT_GROUP" Integer ;
+ABusyLampOff.    Attr ::= "BUSY_LAMP_OFF" Ident ;
+AAbortRequest.   Attr ::= "ABORT_REQUEST" Ident ;
 
-UFRAME.	      frames ::=
-UTOOL.	      frames ::=
+[].    [Attr] ::= ;
+(:[]). [Attr] ::= Attr ;
+(:).   [Attr] ::= Attr [Attr] ;
 
-SYSVAR.     variable ::=
+PFrame.  Position ::= "UFRAME" Integer ;
+PTool.   Position ::= "UTOOL" Integer ;
 
-AI.         register ::=
-AO.	    register ::=
-DI.	    register ::=
-DO.	    register ::=
-GI.	    register ::=
-GO.	    register ::=
-RI.	    register ::=
-RO.	    register ::=
-LBL.	    register ::=
+[].    [Position] ::= ;
+(:[]). [Position] ::= Position ;
+(:).   [Position] ::= Position [Position] ;
 
-ARG.	    Register ::=
-FLAG.	    Register ::=
-POSITION.   Register ::=
-POSREG.	    Register ::=
-NUMREG.	    Register ::=
-RSR.	    Register ::=
-SREG.	    Register ::=
-TIMER	    Register ::=
-TIMERO.	    Register ::= --timeoverflow
-UALM.	    Register ::=
-VR.	    Register ::= 
+RAi.        Register ::= "AI" Integer ;
+RAo.        Register ::= "AO" Integer ;
+RDi.        Register ::= "DI" Integer ;
+RDo.        Register ::= "DO" Integer ;
+RGi.        Register ::= "GI" Integer ;
+RGo.        Register ::= "GO" Integer ;
+RRi.        Register ::= "RI" Integer ;
+RRo.        Register ::= "RO" Integer ;
+RLbl.       Register ::= "LBL" Integer ;
+RArg.       Register ::= "ARG" Integer ;
+RFlag.      Register ::= "FLAG" Integer ;
+RPosition.  Register ::= "POSITION" Integer ;
+RPosReg.    Register ::= "POSREG" Integer ;
+RNumReg.    Register ::= "NUMREG" Integer ;
+RRsr.       Register ::= "RSR" Integer ;
+RSreg.      Register ::= "SREG" Integer ;
+RTimer.     Register ::= "TIMER" Integer ;
+RTimerO.    Register ::= "TIMERO" Integer ;
+RUalm.      Register ::= "UALM" Integer ;
+RVr.        Register ::= "VR" Integer ; 
 
-EAND.	    Exp  ::= Exp  " AND " EXP1;
-EOR.	    Exp1 ::= EXP1 " OR " EXP2;
-EEQL.	    Exp2 ::= Exp2 "<>" Exp3;
-ENEQL.	    Exp2 ::= Exp2 "!=" Exp3;
-ENOT.	    Exp3 ::= "NOT " Exp3;
-ELT.	    Exp4 ::= Exp4 "<" Exp5;
-ELTE.	    Exp4 ::= Exp4 "<=" Exp5;
-EGT.	    Exp4 ::= Exp4 ">" Exp5;
-EGTE.	    Exp4 ::= Exp4 "=>" Exp5;
-ESUB.	    Exp5 ::= Exp5 "-" Exp6;
-EADD.	    Exp5 ::= Exp5 "+" Exp6;
-EMUL.	    Exp5 ::= Exp5 "*" Exp6;
-EDIV.	    Exp5 ::= Exp5 ("/"|"DIV")+ Exp6;
-EQUO.	    Exp5 ::= Exp5 "MOD" Exp6;
-EREG.  	    Exp16 ::= Register "[" Exp17 "]" ;
+EAnd.       Exp  ::= Exp  "AND" Exp1 ;
+EOr.        Exp1 ::= Exp1 "OR" Exp2 ;
+EEql.       Exp2 ::= Exp2 "<>" Exp3 ;
+ENeql.      Exp2 ::= Exp2 "!=" Exp3 ;
+ENot.       Exp3 ::= "NOT" Exp3 ;
+ELt.        Exp4 ::= Exp4 "<" Exp5 ;
+ELte.       Exp4 ::= Exp4 "<=" Exp5 ;
+EGt.        Exp4 ::= Exp4 ">" Exp5 ;
+EGte.       Exp4 ::= Exp4 "=>" Exp5 ;
+ESub.       Exp5 ::= Exp5 "-" Exp6 ;
+EAdd.       Exp5 ::= Exp5 "+" Exp6 ;
+EMul.       Exp5 ::= Exp5 "*" Exp6 ;
+EDiv.       Exp5 ::= Exp5 "/" Exp6 ;
+EDivKey.    Exp5 ::= Exp5 "DIV" Exp6 ;
+EMod.       Exp5 ::= Exp5 "MOD" Exp6 ;
+EReg.       Exp6 ::= Register "[" Exp "]" ;
+EInt.       Exp6 ::= Integer ;
+EDouble.    Exp6 ::= Double ;
+EString.    Exp6 ::= String ;
+EIdent.     Exp6 ::= Ident ;
 
+_.          Exp  ::= Exp1 ;
+_.          Exp1 ::= Exp2 ;
+_.          Exp2 ::= Exp3 ;
+_.          Exp3 ::= Exp4 ;
+_.          Exp4 ::= Exp5 ;
+_.          Exp5 ::= Exp6 ;
+_.          Exp6 ::= "(" Exp ")" ;
 
-if_jump.    	 seclection_register ::= "IF" register_stm "," jump;
-if_jump_bool.    seclection_register ::= "IF" register_bool_stm "," jump;
+-- Selection and Jump statements
+SIfJump.         Statement ::= "IF" Register "," Integer ;
+SIfJumpBool.     Statement ::= "IF" Exp "," Integer ;
+
+[].    [Statement] ::= ;
+(:[]). [Statement] ::= Statement ;
+(:).   [Statement] ::= Statement [Statement] ;
 
 
 -- ABORT ACC AND AP_LD C CALL CONDITION CNT DA DB DISABLE DIV DOWNTO ELSE ENABLE END ENDFOR ERROR_PROG FINDSTR FINE FOR IF INC J JPOS JMP LVC LVCEND L LOCK LPOS MAX_SPEED

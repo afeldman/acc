@@ -1,0 +1,39 @@
+&ACCESS RVP
+DEF io_example()
+  ; KRL I/O Operations Example
+  
+  DECL INT input_state
+  DECL INT output_state
+  
+  ; Read digital input
+  input_state = $IN[1]
+  
+  ; Set digital output
+  $OUT[1] = TRUE
+  $OUT[2] = FALSE
+  
+  ; Toggle output
+  $OUT[3] = NOT $OUT[3]
+  
+  ; Pulse output (port, value, time)
+  PULSE ($OUT[4], TRUE, 0.5)
+  
+  ; Wait for input
+  WAIT FOR $IN[5] == TRUE
+  
+  ; Wait for time
+  WAIT SEC 1.0
+  
+  ; Conditional I/O
+  IF $IN[1] == TRUE AND $IN[2] == FALSE THEN
+    $OUT[10] = TRUE
+  ENDIF
+  
+  ; Analog I/O
+  output_state = $ANOUT[1]
+  $ANOUT[1] = 50
+  
+  ; System outputs
+  $OUT_C[1] = TRUE  ; Controller output
+  
+END

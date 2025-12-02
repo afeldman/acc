@@ -1,0 +1,37 @@
+# Stack Configuration for ACC Compiler Projects
+# Global configuration for all ACC compilers
+
+# LTS Resolver (GHC 9.4.8)
+resolver: lts-21.25
+
+# Packages (will be overridden by individual projects)
+packages: []
+
+# Extra dependencies (LLVM bindings)
+extra-deps:
+  - llvm-hs-14.0.0.0
+  - llvm-hs-pure-14.0.0.0
+  - llvm-hs-pretty-0.13.0.0
+
+# Flags
+flags: {}
+
+# LLVM configuration
+extra-include-dirs:
+  - /usr/lib/llvm-14/include
+
+extra-lib-dirs:
+  - /usr/lib/llvm-14/lib
+
+# Build options
+build:
+  library-profiling: false
+  executable-profiling: false
+  copy-bins: true
+
+# GHC options
+ghc-options:
+  "$everything": -Wall -Wcompat -Wincomplete-record-updates -Wincomplete-uni-patterns -Wredundant-constraints
+
+# Allow newer versions
+allow-newer: true

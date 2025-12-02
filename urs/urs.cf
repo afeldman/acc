@@ -46,10 +46,10 @@ OPlus.    Op1      ::= "+" ;
 OTimes.   Op2      ::= "*" ;
 OMinus.   Op1      ::= "-" ;
 ODiv.     Op1      ::= "/" ;
-ONEq.     Op       ::= "not" ;
+ONot.     Op       ::= "not" ;
 OAnd.     Op       ::= "and" ;
 OOr.      Op       ::= "or" ;
-OOr.      Op       ::= "xor" ;
+OXor.     Op       ::= "xor" ;
 
 EOpA.     Exp      ::= Exp0 Op  Exp0 ;
 EOpE.     Exp      ::= Exp1 Op  Exp1 ;

@@ -1,0 +1,37 @@
+&ACCESS RVP
+DEF motion_example()
+  ; KRL Motion Example
+  
+  ; Position declarations
+  DECL E6POS target_pos
+  DECL AXIS joint_pos
+  DECL FRAME offset
+  
+  ; Initialize base and tool
+  $BASE = $NULLFRAME
+  $TOOL = TOOL_DATA[1]
+  
+  ; Define target position (Cartesian)
+  target_pos = {X 500.0, Y 0.0, Z 600.0, A 0.0, B 0.0, C 0.0, S 2, T 10}
+  
+  ; PTP motion (Point-to-Point)
+  PTP target_pos
+  
+  ; Linear motion
+  target_pos.X = 600.0
+  LIN target_pos
+  
+  ; Circular motion with auxiliary point
+  CIRC {X 550.0, Y 50.0, Z 600.0, A 0.0, B 0.0, C 0.0}, target_pos
+  
+  ; Motion with continuous path
+  PTP target_pos C_DIS
+  
+  ; Axis motion (joint space)
+  joint_pos = {A1 0.0, A2 -90.0, A3 90.0, A4 0.0, A5 0.0, A6 0.0}
+  PTP joint_pos
+  
+  ; Home position
+  PTP $POS_ACT
+  
+END

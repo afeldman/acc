@@ -271,6 +271,32 @@ SWrite.         Stm ::= "WRITE" Ident "(" [WriteItem] ")" ;
 SCondition.     Stm ::= "CONDITION" "[" [ArrayIndexing] "]" ":" ConditionWhenStm "ENDCONDITION";
 SConditionWith. Stm ::= "CONDITION" "[" [ArrayIndexing] "]" ":" "WITH" [ConditionWithStm] ConditionWhenStm "ENDCONDITION";
 
+-- Motion statements (FANUC KAREL)
+SMove.          Stm ::= "MOVE" "TO" Expression ;
+SMoveLinear.    Stm ::= "MOVE" "LINEAR" "TO" Expression ;
+SMoveJoint.     Stm ::= "MOVE" "JOINT" "TO" Expression ;
+SMoveCircular.  Stm ::= "MOVE" "CIRCULAR" "TO" Expression "VIA" Expression ;
+
+-- Built-in procedure calls
+SGetVar.        Stm ::= "GET_VAR" "(" Expression "," Ident "," Expression "," Ident ")" ;
+SSetVar.        Stm ::= "SET_VAR" "(" Expression "," Ident "," Expression "," Expression "," Ident ")" ;
+SGetPort.       Stm ::= "GET_PORT" "(" Expression "," Ident ")" ;
+SSetPort.       Stm ::= "SET_PORT" "(" Expression "," Expression "," Ident ")" ;
+SGetReg.        Stm ::= "GET_REG" "(" Expression "," Ident "," Ident ")" ;
+SSetReg.        Stm ::= "SET_REG" "(" Expression "," Expression "," Ident ")" ;
+SGetTPE.        Stm ::= "GET_TPE_PRM" "(" Ident "," Ident "," Ident ")" ;
+SSetTPE.        Stm ::= "SET_TPE_PRM" "(" Ident "," Ident "," Ident ")" ;
+SClearTPE.      Stm ::= "CLR_TPE_STAT" ;
+SGetJPos.       Stm ::= "GET_JPOS_REG" "(" Expression "," Ident "," Ident ")" ;
+SSetJPos.       Stm ::= "SET_JPOS_REG" "(" Expression "," Ident "," Ident ")" ;
+SGetPosReg.     Stm ::= "GET_POS_REG" "(" Expression "," Ident "," Ident ")" ;
+SSetPosReg.     Stm ::= "SET_POS_REG" "(" Expression "," Ident "," Ident ")" ;
+SGetPosTPE.     Stm ::= "GET_POS_TPE" "(" Ident "," Ident "," Ident ")" ;
+SSetPosTPE.     Stm ::= "SET_POS_TPE" "(" Ident "," Ident "," Ident ")" ;
+SMsg.           Stm ::= "MSG_OK" "(" Expression "," Ident ")" ;
+SActScreen.     Stm ::= "ACTIVATE_SCREEN" "(" Ident ")" ;
+SDeactScreen.   Stm ::= "DEACTIVATE_SCREEN" "(" Ident ")" ;
+
 CWSTMWhen.      ConditionWhenStm ::= "WHEN" GlobalConditionList "DO" [ConditionHandlerAction] ;
 
 CWSTMWith.      ConditionWithStm ::= Ident "[" [ArrayIndexing] "]" Ident "=" Expression ;
@@ -351,6 +377,29 @@ EIdent.   Expression ::= Ident;
 EQString. Expression ::= Text ;
 EDouble.  Expression ::= Double ;
 EInt.     Expression ::= Integer ;
+
+-- Built-in functions (FANUC KAREL)
+EABS.     Expression ::= "ABS" "(" Expression ")" ;
+EACOS.    Expression ::= "ACOS" "(" Expression ")" ;
+EASIN.    Expression ::= "ASIN" "(" Expression ")" ;
+EATAN2.   Expression ::= "ATAN2" "(" Expression "," Expression ")" ;
+ECOS.     Expression ::= "COS" "(" Expression ")" ;
+ESin.     Expression ::= "SIN" "(" Expression ")" ;
+ETan.     Expression ::= "TAN" "(" Expression ")" ;
+ESqrt.    Expression ::= "SQRT" "(" Expression ")" ;
+ELn.      Expression ::= "LN" "(" Expression ")" ;
+EExp.     Expression ::= "EXP" "(" Expression ")" ;
+ETrunc.   Expression ::= "TRUNC" "(" Expression ")" ;
+ERound.   Expression ::= "ROUND" "(" Expression ")" ;
+EStrlen.  Expression ::= "STRLEN" "(" Expression ")" ;
+ESubstr.  Expression ::= "SUBSTR" "(" Expression "," Expression "," Expression ")" ;
+EChr.     Expression ::= "CHR" "(" Expression ")" ;
+EOrd.     Expression ::= "ORD" "(" Expression ")" ;
+EUninitd. Expression ::= "UNINIT" "(" Expression ")" ;
+ECurPos.  Expression ::= "CURPOS" "(" Expression "," Expression ")" ;
+ECurJPos. Expression ::= "CURJPOS" "(" Expression "," Expression ")" ;
+EPosToJ.  Expression ::= "POS_TO_JPOS" "(" Expression "," Expression ")" ;
+EJToPos.  Expression ::= "JPOS_TO_POS" "(" Expression "," Expression ")" ;
 
 (:[]).   [Expression] ::= Expression ;
 (:).     [Expression] ::= Expression "," [Expression];

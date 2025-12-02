@@ -10,7 +10,7 @@ SWhile.     Stm ::= "[" [Stm] "]";
 
 [].    [Stm] ::= ;
 (:[]). [Stm] ::= Stm ;
-(:).   [Stm] ::= Stm[Stm] ;
+(:).   [Stm] ::= Stm [Stm] ;
 
 
 comment "-" ;

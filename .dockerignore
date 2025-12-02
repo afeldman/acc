@@ -1,0 +1,59 @@
+# Docker-Ignore für ACC Project
+# Build-Optimierung: Unnötige Dateien ausschließen
+
+# Build artifacts
+**/build/
+**/.stack-work/
+**/dist/
+**/dist-newstyle/
+**/.cabal-sandbox/
+**/cabal.sandbox.config
+
+# Compiled files
+**/*.hi
+**/*.o
+**/*.so
+**/*.dylib
+**/*.exe
+**/*.bc
+**/*.ll
+
+# Generated files
+**/ParKarel.hs
+**/LexKarel.hs
+**/AbsKarel.hs
+**/PrintKarel.hs
+**/SkelKarel.hs
+**/TestKarel.hs
+**/ErrM.hs
+**/ParKarel.y
+**/LexKarel.x
+**/Makefile
+
+# Version control
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+**/*.md
+!README.md
+**/doc/*.pdf
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+**/*.log
+
+# Test outputs
+**/output/
+**/tmp/

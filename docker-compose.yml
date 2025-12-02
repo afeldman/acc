@@ -1,0 +1,56 @@
+# ACC Docker Compose Configuration
+# Haskell LLVM Compiler Development Environment
+
+version: "3.8"
+
+services:
+  acc-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - BUILDKIT_INLINE_CACHE=1
+    image: acc-haskell-llvm:latest
+    container_name: acc-compiler-dev
+    hostname: acc-dev
+
+    # Mount project directories
+    volumes:
+      - .:/workspace
+      - acc-stack-work:/workspace/.stack-work
+      - acc-cabal:/root/.cabal
+      - acc-stack:/root/.stack
+
+    # Keep container running
+    stdin_open: true
+    tty: true
+
+    # Environment variables
+    environment:
+      - TERM=xterm-256color
+      - LANG=C.UTF-8
+      - LC_ALL=C.UTF-8
+
+    # Working directory
+    working_dir: /workspace
+
+    # Command
+    command: /bin/bash
+
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          cpus: "4"
+          memory: 8G
+        reservations:
+          cpus: "2"
+          memory: 2G
+
+volumes:
+  acc-stack-work:
+    driver: local
+  acc-cabal:
+    driver: local
+  acc-stack:
+    driver: local
