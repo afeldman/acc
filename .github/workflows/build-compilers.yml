@@ -45,11 +45,13 @@ jobs:
                   restore-keys: |
                       ${{ runner.os }}-stack-bf-
 
-            - name: Build Brainfuck Compiler
-              working-directory: bf
+            - name: Install Task
               run: |
-                  chmod +x build.sh
-                  ./build.sh
+                  sh -c "$(curl --location https://taskfile.dev/install.sh)" -- -d -b /usr/local/bin
+
+            - name: Build Brainfuck Compiler
+              run: |
+                  task build:bf
 
             - name: Test Brainfuck Compiler
               working-directory: bf
@@ -112,10 +114,8 @@ jobs:
                       ${{ runner.os }}-stack-ws-
 
             - name: Build Whitespace Compiler
-              working-directory: whitespace
               run: |
-                  chmod +x build.sh
-                  ./build.sh
+                  task build:ws
 
             - name: Test Whitespace Compiler
               working-directory: whitespace
