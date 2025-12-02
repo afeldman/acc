@@ -1,0 +1,129 @@
+version: "3"
+
+tasks:
+  docker-build:
+    desc: Build the ACC compiler Docker image
+    cmds:
+      - docker build -t acc-compiler:latest .
+
+  docker-shell:
+    desc: Open a shell in the Docker container
+    cmds:
+      - docker run --rm -it -v $(pwd):/workspace acc-compiler:latest /bin/bash
+
+  docker-build-compiler:
+    desc: Build a specific compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd {{.COMPILER}} && 
+          bnfc -m --haskell -d *.cf && 
+          cd src && 
+          alex -g Lex*.x && 
+          happy -gca Par*.y && 
+          cd .. && 
+          stack build
+        "
+    vars:
+      COMPILER: '{{.COMPILER | default "karel"}}'
+
+  docker-build-all:
+    desc: Build all compilers in Docker
+    cmds:
+      - task: docker-build-brainfuck
+      - task: docker-build-whitespace
+      - task: docker-build-karel
+      - task: docker-build-basic
+
+  docker-build-karel:
+    desc: Build Karel compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd karel && 
+          bnfc -m --haskell -d karel.cf && 
+          mkdir -p src && 
+          mv karel/*.hs src/ 2>/dev/null || true && 
+          rmdir karel 2>/dev/null || true && 
+          cd src && 
+          alex -g LexKarel.x && 
+          happy -gca ParKarel.y && 
+          cd .. && 
+          stack build
+        "
+
+  docker-build-basic:
+    desc: Build BASIC compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd basic && 
+          bnfc -m --haskell -d basic.cf && 
+          mkdir -p src && 
+          mv basic/*.hs src/ 2>/dev/null || true && 
+          rmdir basic 2>/dev/null || true && 
+          cd src && 
+          alex -g LexBasic.x && 
+          happy -gca ParBasic.y && 
+          cd .. && 
+          stack build
+        "
+
+  docker-build-brainfuck:
+    desc: Build Brainfuck compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd bf && 
+          bnfc -m --haskell -d bf.cf && 
+          mkdir -p src && 
+          mv bf/*.hs src/ 2>/dev/null || true && 
+          rmdir bf 2>/dev/null || true && 
+          cd src && 
+          alex -g LexBF.x && 
+          happy -gca ParBF.y && 
+          cd .. && 
+          stack build
+        "
+
+  docker-build-whitespace:
+    desc: Build Whitespace compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd whitespace && 
+          bnfc -m --haskell -d whitespace.cf && 
+          mkdir -p src && 
+          mv whitespace/*.hs src/ 2>/dev/null || true && 
+          rmdir whitespace 2>/dev/null || true && 
+          cd src && 
+          alex -g LexWhitespace.x && 
+          happy -gca ParWhitespace.y && 
+          cd .. && 
+          stack build
+        "
+
+  docker-test-karel:
+    desc: Test Karel compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd karel && 
+          stack exec karelc -- test/hello.kl -o test/hello
+        "
+
+  docker-test-basic:
+    desc: Test BASIC compiler in Docker
+    cmds:
+      - |
+        docker run --rm -v $(pwd):/workspace acc-compiler:latest bash -c "
+          cd basic && 
+          stack exec basic -- -S test/hallo_welt.basic && 
+          clang-14 test/hallo_welt.ll runtime.c -o test/hello && 
+          ./test/hello
+        "
+
+  docker-clean:
+    desc: Clean Docker images
+    cmds:
+      - docker rmi acc-compiler:latest

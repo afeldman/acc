@@ -1,18 +1,24 @@
 # Haskell LLVM Compiler Development Environment
-FROM haskell:9.4.8
+FROM ubuntu:22.04
 
 LABEL maintainer="Anton Feldmann"
 LABEL description="Haskell + LLVM + BNFC development environment for ACC compiler projects"
-LABEL version="1.0.0"
+LABEL version="2.0.0"
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive \
     LANG=C.UTF-8 \
     LC_ALL=C.UTF-8 \
-    PATH="/root/.local/bin:/root/.cabal/bin:${PATH}"
+    PATH="/root/.local/bin:/root/.cabal/bin:/root/.ghcup/bin:${PATH}"
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
+    # Build essentials
+    build-essential \
+    curl \
+    wget \
+    git \
+    pkg-config \
     # LLVM dependencies
     llvm-14 \
     llvm-14-dev \
@@ -22,21 +28,29 @@ RUN apt-get update && apt-get install -y \
     libedit-dev \
     libffi-dev \
     libncurses5-dev \
-    libz-dev \
-    # Build tools
-    build-essential \
-    cmake \
-    curl \
-    git \
-    pkg-config \
-    # Haskell build tools
-    alex \
-    happy \
+    libncursesw5-dev \
+    zlib1g-dev \
+    libtinfo-dev \
+    libgmp-dev \
     # Utilities
     vim \
     tree \
     htop \
     && rm -rf /var/lib/apt/lists/*
+
+# Install GHCup (Haskell installer)
+RUN curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | \
+    BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
+    BOOTSTRAP_HASKELL_GHC_VERSION=9.4.8 \
+    BOOTSTRAP_HASKELL_CABAL_VERSION=3.10.2.0 \
+    BOOTSTRAP_HASKELL_INSTALL_STACK=1 \
+    BOOTSTRAP_HASKELL_INSTALL_HLS=1 \
+    BOOTSTRAP_HASKELL_ADJUST_BASHRC=1 \
+    sh
+
+# Install alex and happy via cabal
+RUN /root/.ghcup/bin/cabal update && \
+    /root/.ghcup/bin/cabal install alex happy
 
 # Create symbolic links for LLVM tools
 RUN update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-14 100 && \
@@ -45,69 +59,37 @@ RUN update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm
     update-alternatives --install /usr/bin/llc llc /usr/bin/llc-14 100 && \
     update-alternatives --install /usr/bin/lli lli /usr/bin/lli-14 100
 
-# Install Stack (latest)
-RUN curl -sSL https://get.haskellstack.org/ | sh
-
-# Configure Stack to use system GHC
-RUN stack config set system-ghc --global true && \
-    stack config set install-ghc --global false
-
-# Install BNFC globally with cabal
-RUN cabal update && \
-    cabal install --global BNFC && \
-    cabal install --global bnfc-meta
-
-# Pre-install common Haskell packages to speed up builds
-RUN stack install --resolver lts-21.25 \
-    llvm-hs-14.0.0.0 \
-    llvm-hs-pure-14.0.0.0 \
-    llvm-hs-pretty-0.13.0.0 \
-    megaparsec \
-    mtl \
-    transformers \
-    text \
-    bytestring \
-    containers \
-    filepath \
-    directory
+# Install BNFC via cabal
+RUN /root/.ghcup/bin/cabal install BNFC
 
 # Create workspace directory
 WORKDIR /workspace
 
-# Set default resolver
-RUN echo "resolver: lts-21.25" > /root/.stack/global-project/stack.yaml && \
-    echo "packages: []" >> /root/.stack/global-project/stack.yaml && \
-    echo "" >> /root/.stack/global-project/stack.yaml && \
-    echo "extra-deps:" >> /root/.stack/global-project/stack.yaml && \
-    echo "  - llvm-hs-14.0.0.0" >> /root/.stack/global-project/stack.yaml && \
-    echo "  - llvm-hs-pure-14.0.0.0" >> /root/.stack/global-project/stack.yaml && \
-    echo "  - llvm-hs-pretty-0.13.0.0" >> /root/.stack/global-project/stack.yaml
-
 # Verify installations
 RUN echo "=== Versions ===" && \
-    ghc --version && \
-    stack --version && \
-    cabal --version && \
-    bnfc --version && \
+    /root/.ghcup/bin/ghc --version && \
+    /root/.ghcup/bin/stack --version && \
+    /root/.ghcup/bin/cabal --version && \
+    /root/.cabal/bin/bnfc --version && \
     llvm-config --version && \
-    alex --version && \
-    happy --version
+    /root/.cabal/bin/alex --version && \
+    /root/.cabal/bin/happy --version
 
 # Create helpful scripts
 RUN echo '#!/bin/bash\n\
 echo "=== ACC Compiler Development Environment ==="\n\
 echo ""\n\
 echo "Installed Tools:"\n\
-echo "  GHC:        $(ghc --version | head -1)"\n\
-echo "  Stack:      $(stack --version | head -1)"\n\
-echo "  Cabal:      $(cabal --version | head -1)"\n\
-echo "  BNFC:       $(bnfc --version 2>&1 | head -1)"\n\
+echo "  GHC:        $(/root/.ghcup/bin/ghc --version | head -1)"\n\
+echo "  Stack:      $(/root/.ghcup/bin/stack --version | head -1)"\n\
+echo "  Cabal:      $(/root/.ghcup/bin/cabal --version | head -1)"\n\
+echo "  BNFC:       $(/root/.cabal/bin/bnfc --version 2>&1 | head -1)"\n\
 echo "  LLVM:       $(llvm-config --version)"\n\
-echo "  Alex:       $(alex --version | head -1)"\n\
-echo "  Happy:      $(happy --version | head -1)"\n\
+echo "  Alex:       $(/root/.cabal/bin/alex --version | head -1)"\n\
+echo "  Happy:      $(/root/.cabal/bin/happy --version | head -1)"\n\
 echo ""\n\
 echo "Quick Start:"\n\
-echo "  1. Generate parser:  bnfc -m --haskell -o build/ grammar.cf"\n\
+echo "  1. Generate parser:  bnfc -m --haskell -d grammar.cf"\n\
 echo "  2. Build project:    stack build"\n\
 echo "  3. Run tests:        stack test"\n\
 echo "  4. LLVM IR:          llvm-as example.ll -o example.bc"\n\
