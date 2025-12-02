@@ -1,5 +1,6 @@
 # Haskell LLVM Compiler Development Environment
-FROM ubuntu:22.04
+# Using Ubuntu 20.04 for LLVM 9 support (required by llvm-hs-9.0.1)
+FROM ubuntu:20.04
 
 LABEL maintainer="Anton Feldmann"
 LABEL description="Haskell + LLVM + BNFC development environment for ACC compiler projects"
@@ -24,11 +25,7 @@ RUN apt-get update && apt-get install -y \
     llvm-9-dev \
     llvm-9-runtime \
     llvm-9-tools \
-    # LLVM 14 for modern llc/clang tools
-    llvm-14 \
-    llvm-14-runtime \
-    llvm-14-tools \
-    clang-14 \
+    clang-9 \
     # Development libraries
     libedit-dev \
     libffi-dev \
@@ -58,12 +55,12 @@ RUN /root/.ghcup/bin/cabal update && \
     /root/.ghcup/bin/cabal install alex happy
 
 # Create symbolic links for LLVM tools
-# Use LLVM 9 for llvm-config (required by llvm-hs-9.0.1) and LLVM 14 for compilation tools
+# Use LLVM 9 (matches llvm-hs-9.0.1 requirements)
 RUN update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-9 100 && \
-    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100 && \
-    update-alternatives --install /usr/bin/opt opt /usr/bin/opt-14 100 && \
-    update-alternatives --install /usr/bin/llc llc /usr/bin/llc-14 100 && \
-    update-alternatives --install /usr/bin/lli lli /usr/bin/lli-14 100
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-9 100 && \
+    update-alternatives --install /usr/bin/opt opt /usr/bin/opt-9 100 && \
+    update-alternatives --install /usr/bin/llc llc /usr/bin/llc-9 100 && \
+    update-alternatives --install /usr/bin/lli lli /usr/bin/lli-9 100
 
 # Install BNFC via cabal
 RUN /root/.ghcup/bin/cabal install BNFC
