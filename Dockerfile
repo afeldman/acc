@@ -19,12 +19,17 @@ RUN apt-get update && apt-get install -y \
     wget \
     git \
     pkg-config \
-    # LLVM dependencies
+    # LLVM 9 for llvm-hs-9.0.1 Haskell bindings
+    llvm-9 \
+    llvm-9-dev \
+    llvm-9-runtime \
+    llvm-9-tools \
+    # LLVM 14 for modern llc/clang tools
     llvm-14 \
-    llvm-14-dev \
     llvm-14-runtime \
     llvm-14-tools \
     clang-14 \
+    # Development libraries
     libedit-dev \
     libffi-dev \
     libncurses5-dev \
@@ -53,7 +58,8 @@ RUN /root/.ghcup/bin/cabal update && \
     /root/.ghcup/bin/cabal install alex happy
 
 # Create symbolic links for LLVM tools
-RUN update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-14 100 && \
+# Use LLVM 9 for llvm-config (required by llvm-hs-9.0.1) and LLVM 14 for compilation tools
+RUN update-alternatives --install /usr/bin/llvm-config llvm-config /usr/bin/llvm-config-9 100 && \
     update-alternatives --install /usr/bin/clang clang /usr/bin/clang-14 100 && \
     update-alternatives --install /usr/bin/opt opt /usr/bin/opt-14 100 && \
     update-alternatives --install /usr/bin/llc llc /usr/bin/llc-14 100 && \
