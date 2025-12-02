@@ -1,0 +1,425 @@
+version: "3"
+
+vars:
+  LLVM_VERSION: "14"
+  STACK_OPTS: "--no-terminal --color always"
+
+tasks:
+  # Default task
+  default:
+    desc: Zeige alle verfügbaren Tasks
+    cmds:
+      - task --list
+
+  # Build tasks
+  build:
+    desc: Baue alle Compiler
+    cmds:
+      - task: build:bf
+      - task: build:ws
+
+  build:bf:
+    desc: Baue Brainfuck Compiler
+    dir: bf
+    sources:
+      - "src/**/*.hs"
+      - "bf.cf"
+      - "stack.yaml"
+      - "bf-compiler.cabal"
+    generates:
+      - ".stack-work/**/*"
+    cmds:
+      - echo "🔨 Building Brainfuck compiler..."
+      - bnfc -m --haskell -o src/ bf.cf
+      - cd src && [ -f LexBf.x ] && alex LexBf.x -o LexBf.hs || true
+      - cd src && [ -f ParBf.y ] && happy ParBf.y -o ParBf.hs || true
+      - stack build {{.STACK_OPTS}}
+      - echo "✅ Brainfuck compiler built successfully"
+
+  build:ws:
+    desc: Baue Whitespace Compiler
+    dir: whitespace
+    sources:
+      - "src/**/*.hs"
+      - "whitespace.cf"
+      - "stack.yaml"
+      - "ws-compiler.cabal"
+    generates:
+      - ".stack-work/**/*"
+    cmds:
+      - echo "🔨 Building Whitespace compiler..."
+      - bnfc -m --haskell -o src/ whitespace.cf
+      - cd src && [ -f LexWhitespace.x ] && alex LexWhitespace.x -o LexWhitespace.hs || true
+      - cd src && [ -f ParWhitespace.y ] && happy ParWhitespace.y -o ParWhitespace.hs || true
+      - stack build {{.STACK_OPTS}}
+      - echo "✅ Whitespace compiler built successfully"
+
+  # Test tasks
+  test:
+    desc: Teste alle Compiler
+    cmds:
+      - task: test:bf
+      - task: test:ws
+
+  test:bf:
+    desc: Teste Brainfuck Compiler
+    dir: bf
+    deps: [build:bf]
+    cmds:
+      - echo "🧪 Testing Brainfuck compiler..."
+      - |
+        for bf_file in test/*.bf; do
+          echo "  Testing $(basename $bf_file)..."
+          basename=$(basename "$bf_file" .bf)
+          stack exec bfc -- "$bf_file" -emit-llvm -o "${basename}.ll"
+          llc-{{.LLVM_VERSION}} -filetype=obj "${basename}.ll" -o "${basename}.o" || llc -filetype=obj "${basename}.ll" -o "${basename}.o"
+          clang-{{.LLVM_VERSION}} "${basename}.o" -o "${basename}" || clang "${basename}.o" -o "${basename}"
+          rm -f "${basename}.ll" "${basename}.o" "${basename}"
+        done
+      - echo "✅ All Brainfuck tests passed"
+
+  test:ws:
+    desc: Teste Whitespace Compiler
+    dir: whitespace
+    deps: [build:ws]
+    cmds:
+      - echo "🧪 Testing Whitespace compiler..."
+      - |
+        for ws_file in test/*.ws; do
+          echo "  Testing $(basename $ws_file)..."
+          basename=$(basename "$ws_file" .ws)
+          stack exec wsc -- "$ws_file" -emit-llvm -o "${basename}.ll"
+          llc-{{.LLVM_VERSION}} -filetype=obj "${basename}.ll" -o "${basename}.o" || llc -filetype=obj "${basename}.ll" -o "${basename}.o"
+          clang-{{.LLVM_VERSION}} "${basename}.o" -o "${basename}" || clang "${basename}.o" -o "${basename}"
+          rm -f "${basename}.ll" "${basename}.o" "${basename}"
+        done
+      - echo "✅ All Whitespace tests passed"
+
+  # Run tasks
+  run:bf:
+    desc: "Kompiliere und führe Brainfuck Programm aus (Usage: task run:bf FILE=test/hello.bf)"
+    dir: bf
+    deps: [build:bf]
+    vars:
+      FILE: '{{.FILE | default "test/hello.bf"}}'
+      BASENAME:
+        sh: basename "{{.FILE}}" .bf
+    cmds:
+      - echo "🚀 Compiling {{.FILE}}..."
+      - stack exec bfc -- "{{.FILE}}" -emit-llvm -o "{{.BASENAME}}.ll"
+      - llc-{{.LLVM_VERSION}} -filetype=obj "{{.BASENAME}}.ll" -o "{{.BASENAME}}.o" || llc -filetype=obj "{{.BASENAME}}.ll" -o "{{.BASENAME}}.o"
+      - clang-{{.LLVM_VERSION}} "{{.BASENAME}}.o" -o "{{.BASENAME}}" || clang "{{.BASENAME}}.o" -o "{{.BASENAME}}"
+      - echo "🎯 Running {{.BASENAME}}..."
+      - ./{{.BASENAME}}
+      - rm -f "{{.BASENAME}}.ll" "{{.BASENAME}}.o" "{{.BASENAME}}"
+
+  run:ws:
+    desc: "Kompiliere und führe Whitespace Programm aus (Usage: task run:ws FILE=test/simple.ws)"
+    dir: whitespace
+    deps: [build:ws]
+    vars:
+      FILE: '{{.FILE | default "test/simple.ws"}}'
+      BASENAME:
+        sh: basename "{{.FILE}}" .ws
+    cmds:
+      - echo "🚀 Compiling {{.FILE}}..."
+      - stack exec wsc -- "{{.FILE}}" -emit-llvm -o "{{.BASENAME}}.ll"
+      - llc-{{.LLVM_VERSION}} -filetype=obj "{{.BASENAME}}.ll" -o "{{.BASENAME}}.o" || llc -filetype=obj "{{.BASENAME}}.ll" -o "{{.BASENAME}}.o"
+      - clang-{{.LLVM_VERSION}} "{{.BASENAME}}.o" -o "{{.BASENAME}}" || clang "{{.BASENAME}}.o" -o "{{.BASENAME}}"
+      - echo "🎯 Running {{.BASENAME}}..."
+      - ./{{.BASENAME}}
+      - rm -f "{{.BASENAME}}.ll" "{{.BASENAME}}.o" "{{.BASENAME}}"
+
+  # Clean tasks
+  clean:
+    desc: Bereinige alle Build-Artefakte
+    cmds:
+      - task: clean:bf
+      - task: clean:ws
+      - echo "✨ All clean!"
+
+  clean:bf:
+    desc: Bereinige Brainfuck Build-Artefakte
+    dir: bf
+    cmds:
+      - echo "🧹 Cleaning Brainfuck compiler..."
+      - rm -rf .stack-work
+      - rm -f src/AbsBf.hs src/LexBf.hs src/LexBf.x src/ParBf.hs src/ParBf.y src/ParBf.info
+      - rm -f src/PrintBf.hs src/SkelBf.hs src/TestBf.hs src/ErrM.hs
+      - rm -f src/DocBf.txt src/DocBf.tex src/Makefile
+      - rm -f *.ll *.bc *.o *.s hello hello2 echo bfc
+
+  clean:ws:
+    desc: Bereinige Whitespace Build-Artefakte
+    dir: whitespace
+    cmds:
+      - echo "🧹 Cleaning Whitespace compiler..."
+      - rm -rf .stack-work
+      - rm -f src/AbsWhitespace.hs src/LexWhitespace.hs src/LexWhitespace.x src/ParWhitespace.hs src/ParWhitespace.y src/ParWhitespace.info
+      - rm -f src/PrintWhitespace.hs src/SkelWhitespace.hs src/TestWhitespace.hs src/ErrM.hs
+      - rm -f src/DocWhitespace.txt src/DocWhitespace.tex src/Makefile
+      - rm -f *.ll *.bc *.o *.s simple hello wsc
+
+  # Grammar validation
+  validate:
+    desc: Validiere alle BNFC Grammatiken
+    cmds:
+      - echo "🔍 Validating BNFC grammars..."
+      - task: validate:karel
+      - task: validate:krl
+      - task: validate:tpe
+      - task: validate:urs
+      - task: validate:vhdl
+      - task: validate:bf
+      - task: validate:json
+      - task: validate:ini
+      - task: validate:basic
+      - task: validate:ws
+      - echo "✅ All grammars valid!"
+
+  validate:karel:
+    desc: Validiere Karel Grammatik
+    dir: karel
+    cmds:
+      - echo "  Checking karel.cf..."
+      - bnfc -m --haskell karel.cf > /dev/null && echo "  ✓ karel.cf" || echo "  ✗ karel.cf"
+
+  validate:krl:
+    desc: Validiere KRL Grammatik
+    dir: krl
+    cmds:
+      - echo "  Checking krl.cf..."
+      - bnfc -m --haskell krl.cf > /dev/null && echo "  ✓ krl.cf" || echo "  ✗ krl.cf"
+
+  validate:tpe:
+    desc: Validiere TPE Grammatik
+    dir: tpe
+    cmds:
+      - echo "  Checking tpe.cf..."
+      - bnfc -m --haskell tpe.cf > /dev/null && echo "  ✓ tpe.cf" || echo "  ✗ tpe.cf"
+
+  validate:urs:
+    desc: Validiere URS Grammatik
+    dir: urs
+    cmds:
+      - echo "  Checking urs.cf..."
+      - bnfc -m --haskell urs.cf > /dev/null && echo "  ✓ urs.cf" || echo "  ✗ urs.cf"
+
+  validate:vhdl:
+    desc: Validiere VHDL Grammatik
+    dir: vhdl
+    cmds:
+      - echo "  Checking vhdl.cf..."
+      - bnfc -m --haskell vhdl.cf > /dev/null && echo "  ✓ vhdl.cf" || echo "  ✗ vhdl.cf"
+
+  validate:bf:
+    desc: Validiere Brainfuck Grammatik
+    dir: bf
+    cmds:
+      - echo "  Checking bf.cf..."
+      - bnfc -m --haskell bf.cf > /dev/null && echo "  ✓ bf.cf" || echo "  ✗ bf.cf"
+
+  validate:json:
+    desc: Validiere JSON Grammatik
+    dir: json
+    cmds:
+      - echo "  Checking json.cf..."
+      - bnfc -m --haskell json.cf > /dev/null && echo "  ✓ json.cf" || echo "  ✗ json.cf"
+
+  validate:ini:
+    desc: Validiere INI Grammatik
+    dir: ini
+    cmds:
+      - echo "  Checking ini.cf..."
+      - bnfc -m --haskell ini.cf > /dev/null && echo "  ✓ ini.cf" || echo "  ✗ ini.cf"
+
+  validate:basic:
+    desc: Validiere BASIC Grammatik
+    dir: basic
+    cmds:
+      - echo "  Checking basic.cf..."
+      - bnfc -m --haskell basic.cf > /dev/null && echo "  ✓ basic.cf" || echo "  ✗ basic.cf"
+
+  validate:ws:
+    desc: Validiere Whitespace Grammatik
+    dir: whitespace
+    cmds:
+      - echo "  Checking whitespace.cf..."
+      - bnfc -m --haskell whitespace.cf > /dev/null && echo "  ✓ whitespace.cf" || echo "  ✗ whitespace.cf"
+
+  # Package tasks
+  package:
+    desc: Erstelle Release-Pakete
+    deps: [build]
+    cmds:
+      - task: package:bf
+      - task: package:ws
+      - task: package:grammars
+      - echo "📦 All packages created!"
+
+  package:bf:
+    desc: Erstelle Brainfuck Release-Paket
+    deps: [build:bf]
+    cmds:
+      - echo "📦 Packaging Brainfuck compiler..."
+      - mkdir -p artifacts/bf
+      - cp -r bf/test artifacts/bf/
+      - cp bf/README.md artifacts/bf/
+      - cp bf/bf.cf artifacts/bf/
+      - stack --work-dir bf/.stack-work install --local-bin-path artifacts/bf
+      - tar -czf bf-compiler.tar.gz -C artifacts bf
+      - echo "✅ bf-compiler.tar.gz created"
+
+  package:ws:
+    desc: Erstelle Whitespace Release-Paket
+    deps: [build:ws]
+    cmds:
+      - echo "📦 Packaging Whitespace compiler..."
+      - mkdir -p artifacts/whitespace
+      - cp -r whitespace/test artifacts/whitespace/
+      - cp whitespace/README.md artifacts/whitespace/
+      - cp whitespace/whitespace.cf artifacts/whitespace/
+      - stack --work-dir whitespace/.stack-work install --local-bin-path artifacts/whitespace
+      - tar -czf ws-compiler.tar.gz -C artifacts whitespace
+      - echo "✅ ws-compiler.tar.gz created"
+
+  package:grammars:
+    desc: Erstelle Grammatik-Paket
+    cmds:
+      - echo "📦 Packaging grammars..."
+      - mkdir -p artifacts/grammars
+      - |
+        for dir in karel krl tpe urs vhdl bf json ini basic whitespace; do
+          [ -f $dir/*.cf ] && cp $dir/*.cf artifacts/grammars/ || true
+        done
+      - tar -czf grammars.tar.gz -C artifacts grammars
+      - echo "✅ grammars.tar.gz created"
+
+  # Install tasks
+  install:
+    desc: Installiere alle Compiler systemweit
+    deps: [build]
+    cmds:
+      - task: install:bf
+      - task: install:ws
+
+  install:bf:
+    desc: Installiere Brainfuck Compiler systemweit
+    deps: [build:bf]
+    cmds:
+      - echo "📥 Installing bfc..."
+      - stack --work-dir bf/.stack-work install
+      - echo "✅ bfc installed to ~/.local/bin/"
+
+  install:ws:
+    desc: Installiere Whitespace Compiler systemweit
+    deps: [build:ws]
+    cmds:
+      - echo "📥 Installing wsc..."
+      - stack --work-dir whitespace/.stack-work install
+      - echo "✅ wsc installed to ~/.local/bin/"
+
+  # Docker tasks
+  docker:build:
+    desc: Baue Docker Development Image
+    cmds:
+      - echo "🐳 Building Docker image..."
+      - docker-compose build
+      - echo "✅ Docker image built"
+
+  docker:up:
+    desc: Starte Docker Development Container
+    cmds:
+      - docker-compose up -d
+      - echo "✅ Docker container started"
+
+  docker:down:
+    desc: Stoppe Docker Development Container
+    cmds:
+      - docker-compose down
+      - echo "✅ Docker container stopped"
+
+  docker:shell:
+    desc: Öffne Shell in Docker Container
+    cmds:
+      - docker-compose exec acc /bin/bash
+
+  docker:test:
+    desc: Teste Compiler im Docker Container
+    cmds:
+      - docker-compose exec acc bash -c "cd /workspace && task test"
+
+  # CI/CD tasks
+  ci:validate:
+    desc: Validiere GitHub Actions Workflows
+    cmds:
+      - echo "🔍 Validating workflows..."
+      - ./validate-workflows.sh
+
+  ci:test:
+    desc: Teste Workflows lokal mit act
+    cmds:
+      - echo "🧪 Testing workflows with act..."
+      - ./test-workflow.sh list
+
+  ci:test:bf:
+    desc: Teste Brainfuck Workflow lokal
+    cmds:
+      - ./test-workflow.sh bf
+
+  ci:test:ws:
+    desc: Teste Whitespace Workflow lokal
+    cmds:
+      - ./test-workflow.sh ws
+
+  # Development tasks
+  dev:setup:
+    desc: Setup Entwicklungsumgebung
+    cmds:
+      - echo "🛠️  Setting up development environment..."
+      - brew install task || true
+      - brew install stack || true
+      - brew install llvm@14 || true
+      - brew install bnfc || true
+      - stack setup
+      - echo "✅ Development environment ready"
+
+  dev:watch:bf:
+    desc: Watch mode für Brainfuck Compiler
+    dir: bf
+    cmds:
+      - stack build --file-watch --fast {{.STACK_OPTS}}
+
+  dev:watch:ws:
+    desc: Watch mode für Whitespace Compiler
+    dir: whitespace
+    cmds:
+      - stack build --file-watch --fast {{.STACK_OPTS}}
+
+  # Documentation
+  docs:
+    desc: Generiere Dokumentation
+    cmds:
+      - echo "📚 Generating documentation..."
+      - echo "See README.md for main documentation"
+      - echo "See bf/README.md for Brainfuck compiler"
+      - echo "See whitespace/README.md for Whitespace compiler"
+      - echo "See TESTING.md for testing instructions"
+
+  # Info tasks
+  info:
+    desc: Zeige System-Informationen
+    cmds:
+      - echo "🔍 System Information:"
+      - echo ""
+      - echo "Stack:"
+      - stack --version || echo "  Not installed"
+      - echo ""
+      - echo "BNFC:"
+      - bnfc --version || echo "  Not installed"
+      - echo ""
+      - echo "LLVM:"
+      - llc --version | head -n 2 || echo "  Not installed"
+      - echo ""
+      - echo "GHC:"
+      - stack ghc -- --version || echo "  Not installed"
