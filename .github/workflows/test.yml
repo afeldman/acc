@@ -1,0 +1,97 @@
+name: Test Compilers
+
+on:
+    pull_request:
+        branches: [main, master]
+    workflow_dispatch:
+
+jobs:
+    test-brainfuck:
+        name: Test Brainfuck Examples
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Haskell
+              uses: haskell-actions/setup@v2
+              with:
+                  ghc-version: "9.4.8"
+                  enable-stack: true
+                  stack-version: "latest"
+
+            - name: Install LLVM 14
+              run: |
+                  wget https://apt.llvm.org/llvm.sh
+                  chmod +x llvm.sh
+                  sudo ./llvm.sh 14
+                  sudo apt-get install -y llvm-14-dev libllvm14
+
+            - name: Install BNFC
+              run: |
+                  stack install BNFC
+                  echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+            - name: Build Brainfuck Compiler
+              working-directory: bf
+              run: |
+                  chmod +x build.sh
+                  ./build.sh
+
+            - name: Test all Brainfuck examples
+              working-directory: bf
+              run: |
+                  for bf_file in test/*.bf; do
+                    echo "Testing $bf_file..."
+                    basename=$(basename "$bf_file" .bf)
+                    stack exec bfc -- "$bf_file" -emit-llvm -o "${basename}.ll"
+                    llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o"
+                    clang-14 "${basename}.o" -o "${basename}"
+                    echo "Compiled successfully: ${basename}"
+                  done
+
+    test-whitespace:
+        name: Test Whitespace Examples
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Setup Haskell
+              uses: haskell-actions/setup@v2
+              with:
+                  ghc-version: "9.4.8"
+                  enable-stack: true
+                  stack-version: "latest"
+
+            - name: Install LLVM 14
+              run: |
+                  wget https://apt.llvm.org/llvm.sh
+                  chmod +x llvm.sh
+                  sudo ./llvm.sh 14
+                  sudo apt-get install -y llvm-14-dev libllvm14
+
+            - name: Install BNFC
+              run: |
+                  stack install BNFC
+                  echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+            - name: Build Whitespace Compiler
+              working-directory: whitespace
+              run: |
+                  chmod +x build.sh
+                  ./build.sh
+
+            - name: Test all Whitespace examples
+              working-directory: whitespace
+              run: |
+                  for ws_file in test/*.ws; do
+                    echo "Testing $ws_file..."
+                    basename=$(basename "$ws_file" .ws)
+                    stack exec wsc -- "$ws_file" -emit-llvm -o "${basename}.ll"
+                    llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o"
+                    clang-14 "${basename}.o" -o "${basename}"
+                    echo "Compiled successfully: ${basename}"
+                  done

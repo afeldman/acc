@@ -1,0 +1,23 @@
+# Act Configuration for Local GitHub Actions Testing
+
+# Use catthehacker images for better compatibility
+
+-P ubuntu-latest=catthehacker/ubuntu:act-latest
+-P ubuntu-22.04=catthehacker/ubuntu:act-22.04
+-P ubuntu-20.04=catthehacker/ubuntu:act-20.04
+
+# Container architecture
+
+--container-architecture linux/amd64
+
+# Artifact server path (for upload-artifact actions)
+
+--artifact-server-path /tmp/act-artifacts
+
+# Reuse containers for faster testing
+
+--reuse
+
+# Default secrets (add your own as needed)
+
+# -s GITHUB_TOKEN=your_token_here

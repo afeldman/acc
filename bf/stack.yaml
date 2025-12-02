@@ -1,0 +1,19 @@
+resolver: lts-21.25
+
+packages:
+  - .
+
+extra-deps:
+  - llvm-hs-12.0.0
+  - llvm-hs-pure-12.0.0
+  - llvm-hs-pretty-0.13.0.0
+
+flags: {}
+
+extra-include-dirs:
+  - /usr/lib/llvm-14/include
+  - /usr/local/opt/llvm@14/include
+
+extra-lib-dirs:
+  - /usr/lib/llvm-14/lib
+  - /usr/local/opt/llvm@14/lib
