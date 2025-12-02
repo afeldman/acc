@@ -23,12 +23,12 @@ jobs:
                   enable-stack: true
                   stack-version: "latest"
 
-            - name: Install LLVM 14
+            - name: Install LLVM
               run: |
-                  wget https://apt.llvm.org/llvm.sh
-                  chmod +x llvm.sh
-                  sudo ./llvm.sh 14
-                  sudo apt-get install -y llvm-14-dev libllvm14
+                  sudo apt-get update
+                  sudo apt-get install -y llvm-14 llvm-14-dev libllvm14 clang-14 || \
+                  sudo apt-get install -y llvm-15 llvm-15-dev libllvm15 clang-15 || \
+                  sudo apt-get install -y llvm llvm-dev clang
 
             - name: Install BNFC
               run: |
@@ -55,8 +55,8 @@ jobs:
               working-directory: bf
               run: |
                   stack exec bfc -- test/hello.bf -emit-llvm -o hello.ll
-                  llc-14 -filetype=obj hello.ll -o hello.o
-                  clang-14 hello.o -o hello
+                  llc -filetype=obj hello.ll -o hello.o || llc-14 -filetype=obj hello.ll -o hello.o || llc-15 -filetype=obj hello.ll -o hello.o
+                  clang hello.o -o hello || clang-14 hello.o -o hello || clang-15 hello.o -o hello
                   ./hello || true
 
             - name: Package Brainfuck Compiler
@@ -89,12 +89,12 @@ jobs:
                   enable-stack: true
                   stack-version: "latest"
 
-            - name: Install LLVM 14
+            - name: Install LLVM
               run: |
-                  wget https://apt.llvm.org/llvm.sh
-                  chmod +x llvm.sh
-                  sudo ./llvm.sh 14
-                  sudo apt-get install -y llvm-14-dev libllvm14
+                  sudo apt-get update
+                  sudo apt-get install -y llvm-14 llvm-14-dev libllvm14 clang-14 || \
+                  sudo apt-get install -y llvm-15 llvm-15-dev libllvm15 clang-15 || \
+                  sudo apt-get install -y llvm llvm-dev clang
 
             - name: Install BNFC
               run: |
@@ -121,8 +121,8 @@ jobs:
               working-directory: whitespace
               run: |
                   stack exec wsc -- test/simple.ws -emit-llvm -o simple.ll
-                  llc-14 -filetype=obj simple.ll -o simple.o
-                  clang-14 simple.o -o simple
+                  llc -filetype=obj simple.ll -o simple.o || llc-14 -filetype=obj simple.ll -o simple.o || llc-15 -filetype=obj simple.ll -o simple.o
+                  clang simple.o -o simple || clang-14 simple.o -o simple || clang-15 simple.o -o simple
                   ./simple || true
 
             - name: Package Whitespace Compiler

@@ -21,12 +21,12 @@ jobs:
                   enable-stack: true
                   stack-version: "latest"
 
-            - name: Install LLVM 14
+            - name: Install LLVM
               run: |
-                  wget https://apt.llvm.org/llvm.sh
-                  chmod +x llvm.sh
-                  sudo ./llvm.sh 14
-                  sudo apt-get install -y llvm-14-dev libllvm14
+                  sudo apt-get update
+                  sudo apt-get install -y llvm-14 llvm-14-dev libllvm14 clang-14 || \
+                  sudo apt-get install -y llvm-15 llvm-15-dev libllvm15 clang-15 || \
+                  sudo apt-get install -y llvm llvm-dev clang
 
             - name: Install BNFC
               run: |
@@ -46,8 +46,8 @@ jobs:
                     echo "Testing $bf_file..."
                     basename=$(basename "$bf_file" .bf)
                     stack exec bfc -- "$bf_file" -emit-llvm -o "${basename}.ll"
-                    llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o"
-                    clang-14 "${basename}.o" -o "${basename}"
+                    llc -filetype=obj "${basename}.ll" -o "${basename}.o" || llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o" || llc-15 -filetype=obj "${basename}.ll" -o "${basename}.o"
+                    clang "${basename}.o" -o "${basename}" || clang-14 "${basename}.o" -o "${basename}" || clang-15 "${basename}.o" -o "${basename}"
                     echo "Compiled successfully: ${basename}"
                   done
 
@@ -66,12 +66,12 @@ jobs:
                   enable-stack: true
                   stack-version: "latest"
 
-            - name: Install LLVM 14
+            - name: Install LLVM
               run: |
-                  wget https://apt.llvm.org/llvm.sh
-                  chmod +x llvm.sh
-                  sudo ./llvm.sh 14
-                  sudo apt-get install -y llvm-14-dev libllvm14
+                  sudo apt-get update
+                  sudo apt-get install -y llvm-14 llvm-14-dev libllvm14 clang-14 || \
+                  sudo apt-get install -y llvm-15 llvm-15-dev libllvm15 clang-15 || \
+                  sudo apt-get install -y llvm llvm-dev clang
 
             - name: Install BNFC
               run: |
@@ -91,7 +91,7 @@ jobs:
                     echo "Testing $ws_file..."
                     basename=$(basename "$ws_file" .ws)
                     stack exec wsc -- "$ws_file" -emit-llvm -o "${basename}.ll"
-                    llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o"
-                    clang-14 "${basename}.o" -o "${basename}"
+                    llc -filetype=obj "${basename}.ll" -o "${basename}.o" || llc-14 -filetype=obj "${basename}.ll" -o "${basename}.o" || llc-15 -filetype=obj "${basename}.ll" -o "${basename}.o"
+                    clang "${basename}.o" -o "${basename}" || clang-14 "${basename}.o" -o "${basename}" || clang-15 "${basename}.o" -o "${basename}"
                     echo "Compiled successfully: ${basename}"
                   done
