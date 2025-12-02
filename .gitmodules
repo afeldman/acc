@@ -1,0 +1,30 @@
+[submodule "bf"]
+	path = bf
+	url = git@github.com:afeldman/brainfuck-compiler.git
+[submodule "whitespace"]
+	path = whitespace
+	url = git@github.com:afeldman/whitespace-compiler.git
+[submodule "karel"]
+	path = karel
+	url = git@github.com:afeldman/karel-compiler.git
+[submodule "krl"]
+	path = krl
+	url = git@github.com:afeldman/kuka-krl-compiler.git
+[submodule "tpe"]
+	path = tpe
+	url = git@github.com:afeldman/fanuc-tpe-compiler.git
+[submodule "urs"]
+	path = urs
+	url = git@github.com:afeldman/universal-robots-compiler.git
+[submodule "basic"]
+	path = basic
+	url = git@github.com:afeldman/basic-compiler.git
+[submodule "ini"]
+	path = ini
+	url = git@github.com:afeldman/ini-parser.git
+[submodule "json"]
+	path = json
+	url = git@github.com:afeldman/json-parser.git
+[submodule "vhdl"]
+	path = vhdl
+	url = git@github.com:afeldman/vhdl-compiler.git
