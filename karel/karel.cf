@@ -74,7 +74,17 @@ DirEnv.      DirectiveBlock ::= "%ENVIRONMENT" "=" Ident ;
 DirLock.     DirectiveBlock ::= "%LOCKGROUP" "=" [ArrayIndexing] ;
 DirNoAbort.  DirectiveBlock ::= "%NOABORT" "=" ErrorCommandBlock ;
 DirNoPause.  DirectiveBlock ::= "%NOPAUSE" "=" ErrorCommandTPBlock ;
+
+-- Preprocessor directives (C-style)
 DirInclude.  DirectiveBlock ::= "%INCLUDE" Text ;
+DirDefine.   DirectiveBlock ::= "%DEFINE" Ident Expression ;
+DirDefineConst. DirectiveBlock ::= "%DEFINE" Ident Integer ;
+DirUndef.    DirectiveBlock ::= "%UNDEF" Ident ;
+DirIfdef.    DirectiveBlock ::= "%IFDEF" Ident ;
+DirIfndef.   DirectiveBlock ::= "%IFNDEF" Ident ;
+DirIf.       DirectiveBlock ::= "%IF" Expression ;
+DirElse.     DirectiveBlock ::= "%ELSE" ;
+DirEndif.    DirectiveBlock ::= "%ENDIF" ;
 [].    [DirectiveBlock] ::= ;
 (:).   [DirectiveBlock] ::= DirectiveBlock [DirectiveBlock] ;
 

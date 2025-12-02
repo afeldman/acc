@@ -17,6 +17,7 @@ tasks:
     cmds:
       - task: build:bf
       - task: build:ws
+      - task: build:karel
 
   build:bf:
     desc: Baue Brainfuck Compiler
@@ -53,6 +54,24 @@ tasks:
       - cd src && [ -f ParWhitespace.y ] && happy ParWhitespace.y -o ParWhitespace.hs || true
       - stack build {{.STACK_OPTS}}
       - echo "✅ Whitespace compiler built successfully"
+
+  build:karel:
+    desc: Baue Karel Compiler
+    dir: karel
+    sources:
+      - "src/**/*.hs"
+      - "karel.cf"
+      - "stack.yaml"
+      - "karel-compiler.cabal"
+    generates:
+      - ".stack-work/**/*"
+    cmds:
+      - echo "🔨 Building Karel compiler..."
+      - bnfc -m --haskell -o src/ karel.cf
+      - cd src && [ -f LexKarel.x ] && alex LexKarel.x -o LexKarel.hs || true
+      - cd src && [ -f ParKarel.y ] && happy ParKarel.y -o ParKarel.hs || true
+      - stack build {{.STACK_OPTS}}
+      - echo "✅ Karel compiler built successfully"
 
   # Test tasks
   test:
